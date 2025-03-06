@@ -1,0 +1,52 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}View Data{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h2 class="text-center fw-bold">Your Profile Information</h2>
+        <div class="card mt-4 shadow-sm">
+            <div class="card-body">
+                <h3>Personal Details</h3>
+                <ul>
+                    <li><strong>Name:</strong> {{ user.salutation }} {{ user.first_name }} {{ user.last_name }}</li>
+                    <li><strong>Date of Birth:</strong> {{ user.date_of_birth }}</li>
+                    <li><strong>Place of Birth:</strong> {{ user.place_of_birth }}</li>
+                    <li><strong>Citizenship:</strong> {{ user.citizenship }}</li>
+                </ul>
+
+                <h3>Contact Details</h3>
+                <ul>
+                    <li><strong>Email:</strong> {{ user.email }}</li>
+                    <li><strong>Private Email:</strong> {{ user.private_email }}</li>
+                    <li><strong>Office Phone:</strong> {{ user.office_phone }}</li>
+                    <li><strong>Private Mobile:</strong> {{ user.private_mobile }}</li>
+                    <li><strong>Emergency Contact:</strong> {{ user.emergency_contact }}</li>
+                </ul>
+
+                <h3>Employment Details</h3>
+                <ul>
+                    <li><strong>Current Position:</strong> {{ user.current_position }}</li>
+                    <li><strong>Seniority:</strong> {{ user.seniority }}</li>
+                    <li><strong>Start Date:</strong> {{ user.start_date }}</li>
+                    <li><strong>End Date:</strong> {{ user.end_date }}</li>
+                </ul>
+
+                <h3>Wage Data</h3>
+                <ul>
+                    <li><strong>Social Security Number:</strong> {{ user.social_security_number }}</li>
+                    <li><strong>Tax ID Number:</strong> {{ user.tax_identification_number }}</li>
+                    <li><strong>Highest School Certificate:</strong> {{ user.highest_school_certificate }}</li>
+                    <li><strong>Highest Professional Qualification:</strong> {{ user.highest_professional_qualification }}</li>
+                    <li><strong>Tax Class:</strong> {{ user.tax_class }}</li>
+                    <li><strong>Child Allowance:</strong> {{ user.child_allowance }}</li>
+                </ul>
+
+                <div class="mt-4">
+                    <a href="{% url 'edit_profile' %}" class="btn btn-primary"><i class="fa fa-edit"></i> Edit Data</a>
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

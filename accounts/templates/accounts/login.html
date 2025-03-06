@@ -1,0 +1,36 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-sm p-4" style="width: 400px;">
+        <h2 class="text-center mb-4">Login</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="id_username" class="form-label">Username</label>
+                <input type="text" id="id_username" name="username" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="id_password" class="form-label">Password</label>
+                <input type="password" id="id_password" name="password" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

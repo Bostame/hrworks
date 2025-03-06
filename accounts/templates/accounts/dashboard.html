@@ -1,0 +1,10 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <div class="text-center">
+        <h2 class="fw-bold">Welcome, {{ user.first_name }} {{ user.last_name }}!</h2>
+        <p class="lead">This is your personal dashboard.</p>
+    </div>
+{% endblock %}
