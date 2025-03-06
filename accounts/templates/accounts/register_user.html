@@ -4,132 +4,187 @@
 {% block title %}Register User{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <h2 class="mb-4">Register a New User</h2>
+<div class="container mt-5">
+    <h2 class="text-center fw-bold mb-4">Register a New User</h2>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-success">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-
-        <form method="post" enctype="multipart/form-data" class="border p-4 rounded shadow-sm bg-light">
-            {% csrf_token %}
-
-            <h3 class="mt-3">Personal Details</h3>
-
-            <div class="mb-3">
-                {{ form.profile_picture.label_tag }}
-                {{ form.profile_picture|add_class:"form-control" }}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
+        {% endfor %}
+    {% endif %}
 
-            <div class="mb-3">
+    <form method="post" enctype="multipart/form-data" class="border p-4 rounded shadow-sm bg-light">
+        {% csrf_token %}
+
+        <!-- Profile Picture Upload -->
+        <div class="text-center mb-3">
+            <label for="{{ form.profile_picture.id_for_label }}" class="form-label fw-bold">Profile Picture</label>
+            {{ form.profile_picture|add_class:"form-control" }}
+        </div>
+
+        <!-- Personal Details -->
+        <h3 class="mt-3">Personal Details</h3>
+        <div class="row">
+            <div class="col-md-6 mb-3">
                 {{ form.username.label_tag }}
                 {{ form.username|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.first_name.label_tag }}
                 {{ form.first_name|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.last_name.label_tag }}
                 {{ form.last_name|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.salutation.label_tag }}
                 {{ form.salutation|add_class:"form-select" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.date_of_birth.label_tag }}
                 {{ form.date_of_birth|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.place_of_birth.label_tag }}
                 {{ form.place_of_birth|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.citizenship.label_tag }}
                 {{ form.citizenship|add_class:"form-control" }}
             </div>
+        </div>
 
-            <h3 class="mt-3">Contact Details</h3>
-            <div class="mb-3">
+        <!-- Contact Details -->
+        <h3 class="mt-3">Contact Details</h3>
+        <div class="row">
+            <div class="col-md-6 mb-3">
                 {{ form.email.label_tag }}
                 {{ form.email|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.private_email.label_tag }}
                 {{ form.private_email|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.office_phone.label_tag }}
                 {{ form.office_phone|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.private_mobile.label_tag }}
                 {{ form.private_mobile|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.emergency_contact.label_tag }}
                 {{ form.emergency_contact|add_class:"form-control" }}
             </div>
+        </div>
 
-            <h3 class="mt-3">Employment Details</h3>
-            <div class="mb-3">
+        <!-- Employment Details -->
+        <h3 class="mt-3">Employment Details</h3>
+        <div class="row">
+            <div class="col-md-6 mb-3">
                 {{ form.current_position.label_tag }}
                 {{ form.current_position|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.seniority.label_tag }}
                 {{ form.seniority|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.start_date.label_tag }}
                 {{ form.start_date|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.end_date.label_tag }}
                 {{ form.end_date|add_class:"form-control" }}
             </div>
+        </div>
 
-            <h3 class="mt-3">Wage Data</h3>
-            <div class="mb-3">
+        <!-- Wage Data -->
+        <h3 class="mt-3">Wage Data</h3>
+        <div class="row">
+            <div class="col-md-6 mb-3">
                 {{ form.social_security_number.label_tag }}
                 {{ form.social_security_number|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.tax_identification_number.label_tag }}
                 {{ form.tax_identification_number|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.highest_school_certificate.label_tag }}
                 {{ form.highest_school_certificate|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.highest_professional_qualification.label_tag }}
                 {{ form.highest_professional_qualification|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.tax_class.label_tag }}
                 {{ form.tax_class|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.child_allowance.label_tag }}
                 {{ form.child_allowance|add_class:"form-control" }}
             </div>
+        </div>
 
-            <h3 class="mt-3">Set Password</h3>
-            <div class="mb-3">
+        <!-- Address -->
+        <h3 class="mt-3">Address</h3>
+        <div class="mb-3">
+            {{ form.address.label_tag }}
+            {{ form.address|add_class:"form-control" }}
+        </div>
+
+        <!-- Bank Account -->
+        <h3 class="mt-3">Bank Account</h3>
+        <div class="mb-3">
+            {{ form.bank_account.label_tag }}
+            {{ form.bank_account|add_class:"form-control" }}
+        </div>
+
+        <!-- Children Details -->
+        <h3 class="mt-3">Children</h3>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ form.child_name.label_tag }}
+                {{ form.child_name|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.child_birthdate.label_tag }}
+                {{ form.child_birthdate|add_class:"form-control" }}
+            </div>
+        </div>
+
+        <!-- Health Insurance -->
+        <h3 class="mt-3">Health Insurance</h3>
+        <div class="mb-3">
+            {{ form.health_insurance.label_tag }}
+            {{ form.health_insurance|add_class:"form-control" }}
+        </div>
+
+        <!-- Password Fields -->
+        <h3 class="mt-3">Set Password</h3>
+        <div class="row">
+            <div class="col-md-6 mb-3">
                 {{ form.password1.label_tag }}
                 {{ form.password1|add_class:"form-control" }}
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 {{ form.password2.label_tag }}
                 {{ form.password2|add_class:"form-control" }}
             </div>
+        </div>
 
-            <button type="submit" class="btn btn-success mt-3">Register User</button>
-            <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">Back to Dashboard</a>
-        </form>
-    </div>
+        <!-- Submit and Cancel Buttons -->
+        <div class="d-flex justify-content-between mt-4">
+            <button type="submit" class="btn btn-success w-50 me-2">Register User</button>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary w-50">Cancel</a>
+        </div>
+    </form>
+</div>
 {% endblock %}
