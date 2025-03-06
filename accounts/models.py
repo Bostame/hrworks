@@ -42,10 +42,24 @@ class CustomUser(AbstractUser):
         null=True
     )
 
+    # Address
+    address = models.CharField(max_length=255, blank=True, null=True)
+
+    # Bank Account
+    bank_account = models.CharField(max_length=34, blank=True, null=True)
+
+    # Children
+    child_name = models.CharField(max_length=255, blank=True, null=True)
+    child_birthdate = models.DateField(blank=True, null=True)
+
+    # Health Insurance
+    health_insurance = models.CharField(max_length=255, blank=True, null=True)
+
     def get_profile_picture(self):
         if self.profile_picture:
             return self.profile_picture.url
         return f"{settings.MEDIA_URL}profile_pictures/default_profile.png"  # Ensures correct URL for default image
+
 
 
     

@@ -3,50 +3,145 @@
 {% block title %}View Data{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <h2 class="text-center fw-bold">Your Profile Information</h2>
-        <div class="card mt-4 shadow-sm">
-            <div class="card-body">
-                <h3>Personal Details</h3>
-                <ul>
-                    <li><strong>Name:</strong> {{ user.salutation }} {{ user.first_name }} {{ user.last_name }}</li>
-                    <li><strong>Date of Birth:</strong> {{ user.date_of_birth }}</li>
-                    <li><strong>Place of Birth:</strong> {{ user.place_of_birth }}</li>
-                    <li><strong>Citizenship:</strong> {{ user.citizenship }}</li>
-                </ul>
+<div class="container mt-5">
+    <h2 class="text-center fw-bold">Your Profile Information</h2>
 
-                <h3>Contact Details</h3>
-                <ul>
-                    <li><strong>Email:</strong> {{ user.email }}</li>
-                    <li><strong>Private Email:</strong> {{ user.private_email }}</li>
-                    <li><strong>Office Phone:</strong> {{ user.office_phone }}</li>
-                    <li><strong>Private Mobile:</strong> {{ user.private_mobile }}</li>
-                    <li><strong>Emergency Contact:</strong> {{ user.emergency_contact }}</li>
-                </ul>
-
-                <h3>Employment Details</h3>
-                <ul>
-                    <li><strong>Current Position:</strong> {{ user.current_position }}</li>
-                    <li><strong>Seniority:</strong> {{ user.seniority }}</li>
-                    <li><strong>Start Date:</strong> {{ user.start_date }}</li>
-                    <li><strong>End Date:</strong> {{ user.end_date }}</li>
-                </ul>
-
-                <h3>Wage Data</h3>
-                <ul>
-                    <li><strong>Social Security Number:</strong> {{ user.social_security_number }}</li>
-                    <li><strong>Tax ID Number:</strong> {{ user.tax_identification_number }}</li>
-                    <li><strong>Highest School Certificate:</strong> {{ user.highest_school_certificate }}</li>
-                    <li><strong>Highest Professional Qualification:</strong> {{ user.highest_professional_qualification }}</li>
-                    <li><strong>Tax Class:</strong> {{ user.tax_class }}</li>
-                    <li><strong>Child Allowance:</strong> {{ user.child_allowance }}</li>
-                </ul>
-
-                <div class="mt-4">
-                    <a href="{% url 'edit_profile' %}" class="btn btn-primary"><i class="fa fa-edit"></i> Edit Data</a>
-                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+    <div class="row mt-4 g-4">
+        <!-- Profile Picture and Status -->
+        <div class="col-md-12">
+            <div class="card shadow-sm text-center p-4">
+                <div class="card-body">
+                    <img src="{{ user.get_profile_picture }}" alt="Profile Picture"
+                         class="rounded-circle shadow-sm mb-3" width="120" height="120">
+                    <h4 class="fw-bold">{{ user.salutation }} {{ user.first_name }} {{ user.last_name }}</h4>
+                    <p class="text-muted">{{ user.email }}</p>
+                    <p class="text-muted">{{ user.office_phone }}</p>
+                    <input type="text" class="form-control mt-2" placeholder="Click here to add a status message">
                 </div>
             </div>
         </div>
+
+        <!-- Personal Details -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title fw-bold">Personal Details</h4>
+                    <ul class="list-unstyled">
+                        <li><strong>Date of Birth:</strong> {{ user.date_of_birth }}</li>
+                        <li><strong>Place of Birth:</strong> {{ user.place_of_birth }}</li>
+                        <li><strong>Citizenship:</strong> {{ user.citizenship }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Details -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title fw-bold">Contact Details</h4>
+                    <ul class="list-unstyled">
+                        <li><strong>Email:</strong> {{ user.email }}</li>
+                        <li><strong>Private Email:</strong> {{ user.private_email }}</li>
+                        <li><strong>Office Phone:</strong> {{ user.office_phone }}</li>
+                        <li><strong>Private Mobile:</strong> {{ user.private_mobile }}</li>
+                        <li><strong>Emergency Contact:</strong> {{ user.emergency_contact }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Employment Details -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title fw-bold">Employment Details</h4>
+                    <ul class="list-unstyled">
+                        <li><strong>Current Position:</strong> {{ user.current_position }}</li>
+                        <li><strong>Seniority:</strong> {{ user.seniority }}</li>
+                        <li><strong>Start Date:</strong> {{ user.start_date }}</li>
+                        <li><strong>End Date:</strong> {{ user.end_date }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wage Data -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title fw-bold">Wage Data</h4>
+                    <ul class="list-unstyled">
+                        <li><strong>Social Security Number:</strong> {{ user.social_security_number }}</li>
+                        <li><strong>Tax ID Number:</strong> {{ user.tax_identification_number }}</li>
+                        <li><strong>Highest School Certificate:</strong> {{ user.highest_school_certificate }}</li>
+                        <li><strong>Highest Professional Qualification:</strong> {{ user.highest_professional_qualification }}</li>
+                        <li><strong>Tax Class:</strong> {{ user.tax_class }}</li>
+                        <li><strong>Child Allowance:</strong> {{ user.child_allowance }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Address -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title fw-bold">Address</h4>
+                    <ul class="list-unstyled">
+                        <li><strong>Permanent Residence:</strong></li>
+                        <li>{{ user.address }}</li>
+                    </ul>
+                    <a href="#" class="btn btn-sm btn-dark"><i class="fa fa-plus"></i> Add Address</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bank Account -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title fw-bold">Bank Account</h4>
+                    <ul class="list-unstyled">
+                        <li>{{ user.bank_account }}</li>
+                    </ul>
+                    <a href="#" class="btn btn-sm btn-dark"><i class="fa fa-plus"></i> Add Bank Connection</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Children Details -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title fw-bold">Children</h4>
+                    <ul class="list-unstyled">
+                        <li><strong>{{ user.child_name }}</strong></li>
+                        <li>{{ user.child_birthdate }}</li>
+                    </ul>
+                    <a href="#" class="btn btn-sm btn-dark"><i class="fa fa-plus"></i> Add Child</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Health Insurance -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title fw-bold">Health Insurance</h4>
+                    <ul class="list-unstyled">
+                        <li>{{ user.health_insurance }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
     </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center mt-4">
+        <a href="{% url 'edit_profile' %}" class="btn btn-primary"><i class="fa fa-edit"></i> Edit Data</a>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>
 {% endblock %}

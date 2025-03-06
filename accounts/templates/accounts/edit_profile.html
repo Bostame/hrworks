@@ -1,27 +1,80 @@
 {% extends 'accounts/base.html' %}
+{% load widget_tweaks %}
 
 {% block title %}Edit Profile{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <h2>Edit Profile</h2>
+<div class="container mt-5">
+    <h2 class="text-center fw-bold mb-4">Edit Profile</h2>
 
-        {% if messages %}
+    {% if messages %}
         {% for message in messages %}
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ message }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         {% endfor %}
-        {% endif %}
+    {% endif %}
 
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="mb-3">
-                {{ form.as_p }}
-            </div>
-            <button type="submit" class="btn btn-success">Save Changes</button>
-            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
-        </form>
+    <!-- Profile Picture -->
+    <div class="text-center">
+        <img src="{{ user.get_profile_picture }}" alt="Profile Picture"
+             class="rounded-circle shadow-sm mb-3" width="120" height="120">
     </div>
+
+    <form method="post" enctype="multipart/form-data" class="border p-4 rounded shadow-sm bg-light">
+        {% csrf_token %}
+
+        <!-- Profile Picture Upload -->
+        <div class="mb-3">
+            <label class="form-label">Profile Picture</label>
+            {{ form.profile_picture|add_class:"form-control" }}
+        </div>
+
+        <!-- Personal Details -->
+        <h3 class="mt-3">Personal Details</h3>
+        <div class="row">
+            <div class="col-md-6 mb-3">{{ form.first_name|add_class:"form-control" }}</div>
+            <div class="col-md-6 mb-3">{{ form.last_name|add_class:"form-control" }}</div>
+            <div class="col-md-6 mb-3">{{ form.salutation|add_class:"form-select" }}</div>
+            <div class="col-md-6 mb-3">{{ form.date_of_birth|add_class:"form-control" }}</div>
+            <div class="col-md-6 mb-3">{{ form.place_of_birth|add_class:"form-control" }}</div>
+            <div class="col-md-6 mb-3">{{ form.citizenship|add_class:"form-control" }}</div>
+        </div>
+
+        <!-- Address -->
+        <h3 class="mt-3">Address</h3>
+        <div class="mb-3">{{ form.address|add_class:"form-control" }}</div>
+
+        <!-- Contact Details -->
+        <h3 class="mt-3">Contact Details</h3>
+        <div class="row">
+            <div class="col-md-6 mb-3">{{ form.private_email|add_class:"form-control" }}</div>
+            <div class="col-md-6 mb-3">{{ form.office_phone|add_class:"form-control" }}</div>
+            <div class="col-md-6 mb-3">{{ form.private_mobile|add_class:"form-control" }}</div>
+            <div class="col-md-6 mb-3">{{ form.emergency_contact|add_class:"form-control" }}</div>
+        </div>
+
+        <!-- Bank Account -->
+        <h3 class="mt-3">Bank Account</h3>
+        <div class="mb-3">{{ form.bank_account|add_class:"form-control" }}</div>
+
+        <!-- Children Details -->
+        <h3 class="mt-3">Children</h3>
+        <div class="row">
+            <div class="col-md-6 mb-3">{{ form.child_name|add_class:"form-control" }}</div>
+            <div class="col-md-6 mb-3">{{ form.child_birthdate|add_class:"form-control" }}</div>
+        </div>
+
+        <!-- Health Insurance -->
+        <h3 class="mt-3">Health Insurance</h3>
+        <div class="mb-3">{{ form.health_insurance|add_class:"form-control" }}</div>
+
+        <!-- Submit and Cancel Buttons -->
+        <div class="d-flex justify-content-between mt-4">
+            <button type="submit" class="btn btn-success w-50 me-2">Save Changes</button>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary w-50">Cancel</a>
+        </div>
+    </form>
+</div>
 {% endblock %}
