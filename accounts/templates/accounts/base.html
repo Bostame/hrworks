@@ -19,26 +19,29 @@
             <span class="ms-2 fw-bold">Techiecraft</span>
         </a>        
     
-        <!-- Check if user is logged in before showing the profile dropdown -->
+        <!-- User Profile Dropdown (Right) -->
         {% if user.is_authenticated %}
-        <div class="ms-auto">
+        <div class="ms-auto position-relative">
             <div class="dropdown">
-                <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
-                    <img src="{{ user.get_profile_picture }}"
-                    alt="Profile Picture"
-                    class="rounded-circle"
-                    width="30" height="30">
-                    {{ user.first_name }} {{ user.last_name }}
+                <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="{{ user.get_profile_picture }}" class="rounded-circle" width="40" height="40" alt="Profile Picture">
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="{% url 'view_data' %}"><i class="fa fa-eye"></i> View Data</a></li>
+                <ul class="dropdown-menu dropdown-menu-end shadow p-3" aria-labelledby="profileDropdown" style="width: 250px;">
+                    <li class="text-center">
+                        <img src="{{ user.get_profile_picture }}" class="rounded-circle mb-2" width="60" height="60" alt="Profile Picture">
+                        <h6 class="fw-bold mb-0">{{ user.first_name }} {{ user.last_name }}</h6>
+                        <p class="text-muted small">{{ user.email }}</p>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'my_profile' %}"><i class="fa fa-user-circle"></i> My Profile</a></li>
                     {% if user.is_superuser %}
-                        <li><a class="dropdown-item" href="{% url 'register_user' %}"><i class="fa fa-user-plus"></i> Add User</a></li>
+                        <li><a class="dropdown-item" href="{% url 'register_user' %}"><i class="fa fa-user-plus"></i> Register User</a></li>
                     {% endif %}
+                    <li><hr class="dropdown-divider"></li>
                     <li>
                         <form action="{% url 'logout' %}" method="post">
                             {% csrf_token %}
-                            <button class="dropdown-item text-danger"><i class="fa fa-sign-out-alt"></i> Logout</button>
+                            <button class="btn btn-danger w-100"><i class="fa fa-sign-out-alt"></i> Log off</button>
                         </form>
                     </li>
                 </ul>
@@ -46,7 +49,6 @@
         </div>
         {% endif %}
     </nav>
-    
 
     <!-- Page Content -->
     <div class="container mt-5">

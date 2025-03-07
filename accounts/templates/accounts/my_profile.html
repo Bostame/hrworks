@@ -1,15 +1,15 @@
 {% extends 'accounts/base.html' %}
 
-{% block title %}View Data{% endblock %}
+{% block title %}My Profile{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center fw-bold">Your Profile Information</h2>
+<div class="container mt-4">
+    <h2 class="text-center fw-bold mb-4">My Profile</h2>
 
-    <div class="row mt-4 g-4">
-        <!-- Profile Picture and Status -->
+    <div class="row g-4">
+        <!-- Profile Picture and Status Box -->
         <div class="col-md-12">
-            <div class="card shadow-sm text-center p-4">
+            <div class="card shadow-sm p-4 text-center">
                 <div class="card-body">
                     <img src="{{ user.get_profile_picture }}" alt="Profile Picture"
                          class="rounded-circle shadow-sm mb-3" width="120" height="120">
@@ -25,7 +25,7 @@
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h4 class="card-title fw-bold">Personal Details</h4>
+                    <h4 class="fw-bold">Personal Details</h4>
                     <ul class="list-unstyled">
                         <li><strong>Date of Birth:</strong> {{ user.date_of_birth }}</li>
                         <li><strong>Place of Birth:</strong> {{ user.place_of_birth }}</li>
@@ -39,7 +39,7 @@
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h4 class="card-title fw-bold">Contact Details</h4>
+                    <h4 class="fw-bold">Contact Details</h4>
                     <ul class="list-unstyled">
                         <li><strong>Email:</strong> {{ user.email }}</li>
                         <li><strong>Private Email:</strong> {{ user.private_email }}</li>
@@ -55,7 +55,7 @@
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h4 class="card-title fw-bold">Employment Details</h4>
+                    <h4 class="fw-bold">Employment Details</h4>
                     <ul class="list-unstyled">
                         <li><strong>Current Position:</strong> {{ user.current_position }}</li>
                         <li><strong>Seniority:</strong> {{ user.seniority }}</li>
@@ -70,7 +70,7 @@
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h4 class="card-title fw-bold">Wage Data</h4>
+                    <h4 class="fw-bold">Wage Data</h4>
                     <ul class="list-unstyled">
                         <li><strong>Social Security Number:</strong> {{ user.social_security_number }}</li>
                         <li><strong>Tax ID Number:</strong> {{ user.tax_identification_number }}</li>
@@ -87,7 +87,7 @@
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h4 class="card-title fw-bold">Address</h4>
+                    <h4 class="fw-bold">Address</h4>
                     <ul class="list-unstyled">
                         <li><strong>Permanent Residence:</strong></li>
                         <li>{{ user.address }}</li>
@@ -101,7 +101,7 @@
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h4 class="card-title fw-bold">Bank Account</h4>
+                    <h4 class="fw-bold">Bank Account</h4>
                     <ul class="list-unstyled">
                         <li>{{ user.bank_account }}</li>
                     </ul>
@@ -114,7 +114,7 @@
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h4 class="card-title fw-bold">Children</h4>
+                    <h4 class="fw-bold">Children</h4>
                     <ul class="list-unstyled">
                         <li><strong>{{ user.child_name }}</strong></li>
                         <li>{{ user.child_birthdate }}</li>
@@ -128,19 +128,18 @@
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h4 class="card-title fw-bold">Health Insurance</h4>
+                    <h4 class="fw-bold">Health Insurance</h4>
                     <ul class="list-unstyled">
                         <li>{{ user.health_insurance }}</li>
                     </ul>
                 </div>
             </div>
         </div>
-
     </div>
 
     <!-- Action Buttons -->
     <div class="text-center mt-4">
-        <a href="{% url 'edit_profile' %}" class="btn btn-primary"><i class="fa fa-edit"></i> Edit Data</a>
+        <a href="{% url 'edit_profile' %}" class="btn btn-primary"><i class="fa fa-edit"></i> Edit Profile</a>
         <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
     </div>
 </div>

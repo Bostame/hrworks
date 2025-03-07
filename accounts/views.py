@@ -37,5 +37,5 @@ def edit_profile(request):
 
 
 @login_required
-def view_data(request):
-    return render(request, 'accounts/view_data.html', {'user': request.user})
+def my_profile(request):
+    return render(request, 'accounts/my_profile.html', {'user': request.user})

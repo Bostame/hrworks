@@ -7,7 +7,7 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('edit-profile/', views.edit_profile, name='edit_profile'),
-    path('register/', views.register_user, name='register_user'),  # ✅ Ensure this is included
-    path('view-data/', views.view_data, name='view_data'),
+    path('register/', views.register_user, name='register_user'), 
+    path('my-profile/', views.my_profile, name='my_profile'),
 
 ]
