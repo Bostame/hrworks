@@ -230,3 +230,28 @@ def export_pdf(request):
 
     # Return the PDF as a downloadable file
     return FileResponse(buffer, as_attachment=True, filename=f"work_hours_report_{user.username}.pdf")
+
+
+def telephone_directory(request):
+    return render(request, 'accounts/telephone_directory.html')
+
+def company_information(request):
+    return render(request, 'accounts/company_information.html')
+
+def company_calendar_this_week(request):
+    return render(request, 'accounts/company_calendar_this_week.html')
+
+def company_calendar_org_units(request):
+    return render(request, 'accounts/company_calendar_org_units.html')
+
+def company_calendar_superior(request):
+    return render(request, 'accounts/company_calendar_superior.html')
+
+def company_calendar_person(request):
+    return render(request, 'accounts/company_calendar_person.html')
+
+def company_calendar_group(request):
+    return render(request, 'accounts/company_calendar_group.html')
+
+def company_calendar_attendance(request):
+    return render(request, 'accounts/company_calendar_attendance.html')
