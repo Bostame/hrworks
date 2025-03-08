@@ -29,7 +29,7 @@ class UserRegistrationForm(UserCreationForm):
     tax_class = forms.IntegerField(required=False)
     child_allowance = forms.IntegerField(required=False)
 
-    # New Fields (for Address, Bank, Children, and Health Insurance)
+    # Address, Bank, Children, and Health Insurance
     address = forms.CharField(max_length=255, required=False)
     bank_account = forms.CharField(max_length=34, required=False)
     child_name = forms.CharField(max_length=255, required=False)
@@ -69,3 +69,17 @@ class UserEditForm(forms.ModelForm):
             'child_birthdate': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
 
+from django import forms
+from accounts.models import Event
+
+class EventForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = ['title', 'event_type', 'start_time', 'end_time', 'location']
+        widgets = {
+            'start_time': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'end_time': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'event_type': forms.Select(attrs={'class': 'form-select'}),
+            'location': forms.TextInput(attrs={'class': 'form-control'}),
+        }

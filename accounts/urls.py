@@ -1,8 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
-from .views import clock_in, clock_out, dashboard, get_live_hours, export_pdf, telephone_directory
-
+from .views import clock_in, clock_out, dashboard, get_live_hours, export_pdf, telephone_directory, company_calendar, company_calendar_view, add_event
 urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='accounts/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
@@ -22,4 +21,13 @@ urlpatterns = [
     path('company-overview/company-calendar/person/', views.company_calendar_person, name='company_calendar_person'),
     path('company-overview/company-calendar/group/', views.company_calendar_group, name='company_calendar_group'),
     path('company-overview/company-calendar/attendance/', views.company_calendar_attendance, name='company_calendar_attendance'),
+    path("company-overview/company-calendar/", company_calendar, name="company_calendar"),
+    path("company-overview/company-calendar/add/", add_event, name="add_event"),
+    path("company-overview/company-calendar/<str:view_type>/", company_calendar_view, name="company_calendar_view"),
+    path('company-overview/company-calendar/edit/<int:event_id>/', views.edit_event, name='edit_event'),
+    path('company-overview/company-calendar/delete/<int:event_id>/', views.delete_event, name='delete_event'),
+    path("company-overview/company-calendar/edit/<int:event_id>/", views.edit_event, name="edit_event"),
+    path("company-overview/company-calendar/delete/<int:event_id>/", views.delete_event, name="delete_event"),
+
+
 ]

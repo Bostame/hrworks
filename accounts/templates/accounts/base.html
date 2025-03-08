@@ -35,16 +35,16 @@
                     <li><a class="dropdown-item" href="{% url 'telephone_directory' %}">📞 Telephone Directory</a></li>
                     <li><a class="dropdown-item" href="{% url 'company_information' %}">🏢 Company Information</a></li>
                     <li class="dropdown-submenu">
-                        <a class="dropdown-item dropdown-toggle" href="#">📅 Company Calendar</a>
-                        <ul class="dropdown-menu shadow">
-                            <li><a class="dropdown-item" href="{% url 'company_calendar_this_week' %}">This Week</a></li>
-                            <li><a class="dropdown-item" href="{% url 'company_calendar_org_units' %}">By Organizational Units</a></li>
-                            <li><a class="dropdown-item" href="{% url 'company_calendar_superior' %}">By Superior</a></li>
-                            <li><a class="dropdown-item" href="{% url 'company_calendar_person' %}">Individual Person Selection</a></li>
-                            <li><a class="dropdown-item" href="{% url 'company_calendar_group' %}">Individual Group Selection</a></li>
-                            <li><a class="dropdown-item" href="{% url 'company_calendar_attendance' %}">Attendance Overview</a></li>
+                        <a class="dropdown-item dropdown-toggle" href="{% url 'company_calendar' %}">📅 Company Calendar</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'company_calendar_view' 'this_week' %}">This Week</a></li>
+                            <li><a class="dropdown-item" href="{% url 'company_calendar_view' 'org_units' %}">By Organizational Units</a></li>
+                            <li><a class="dropdown-item" href="{% url 'company_calendar_view' 'superior' %}">By Superior</a></li>
+                            <li><a class="dropdown-item" href="{% url 'company_calendar_view' 'person' %}">Individual Person Selection</a></li>
+                            <li><a class="dropdown-item" href="{% url 'company_calendar_view' 'group' %}">Individual Group Selection</a></li>
+                            <li><a class="dropdown-item" href="{% url 'company_calendar_view' 'attendance' %}">Attendance Overview</a></li>
                         </ul>
-                    </li>
+                    </li>                    
                 </ul>
             </div>
 

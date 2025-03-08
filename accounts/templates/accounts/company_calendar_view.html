@@ -1,0 +1,77 @@
+{% extends "accounts/base.html" %}
+{% block title %}Company Calendar{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="fw-bold text-center mb-4">
+        <i class="fa fa-calendar-alt"></i> Company Calendar
+    </h2>
+
+    <!-- Show "Add Event" Button for Admins -->
+    {% if user.is_superuser %}
+    <div class="text-end mb-3">
+        <a href="{% url 'add_event' %}" class="btn btn-success shadow-sm">
+            <i class="fa fa-plus"></i> Add Event
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Event Listings (Card Design) -->
+    <h4 class="fw-bold text-center text-primary mb-3">📅 Scheduled Events</h4>
+
+    <div class="row">
+        {% for event in events %}
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold">{{ event.title }}</h5>
+                        <span class="badge 
+                            {% if event.event_type == 'Meeting' %}bg-info{% elif event.event_type == 'Work Shift' %}bg-warning{% elif event.event_type == 'Group Meeting' %}bg-success{% else %}bg-secondary{% endif %}
+                        ">
+                            {{ event.event_type }}
+                        </span>
+                        <hr>
+                        <p><i class="fa fa-clock"></i> <strong>Time:</strong> {{ event.start_time|date:"M d, Y H:i" }} - {{ event.end_time|date:"H:i" }}</p>
+                        <p><i class="fa fa-map-marker-alt"></i> <strong>Location:</strong> {{ event.location|default:"N/A" }}</p>
+                        <p class="text-muted small"><i class="fa fa-user"></i> Created by: {{ event.created_by }}</p>
+                        
+                        <!-- Edit & Delete Icons (Only for Admins) -->
+                        {% if user.is_superuser %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'edit_event' event.id %}" class="btn btn-warning btn-sm">
+                                <i class="fa fa-edit"></i> Edit
+                            </a>
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ event.id }}">
+                                <i class="fa fa-trash"></i> Delete
+                            </button>
+                        </div>
+                        
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ event.id }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete the event "<strong>{{ event.title }}</strong>"?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <a href="{% url 'delete_event' event.id %}" class="btn btn-danger">Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-center mt-4">🚫 No events scheduled.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

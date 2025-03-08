@@ -1,10 +1,9 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .forms import UserEditForm
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import UserEditForm, EventForm
 from django.contrib import messages
 from .forms import UserRegistrationForm
 from django.utils.timezone import now
-from .models import TimeTracking
+from .models import TimeTracking, CustomUser, Event
 from datetime import timedelta
 from decimal import Decimal  # Import Decimal
 from django.db.models import Sum
@@ -14,20 +13,30 @@ import io
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
 from django.core.paginator import Paginator
-from .models import CustomUser
+from datetime import datetime
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.utils.timezone import make_aware
+from django.utils.dateparse import parse_datetime
+from django.contrib.auth.hashers import make_password
 
 @login_required
 def register_user(request):
     if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
+        form = UserRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, "User created successfully!")
+            user = form.save(commit=False)  # Don't save yet
+            user.password = make_password(form.cleaned_data["password1"])  # Hash password manually
+            user.save()
+            messages.success(request, "✅ User created successfully!")
             return redirect('dashboard')  # Redirect after creating a user
+        else:
+            print("🔴 Form Errors:", form.errors.as_json())  # Debugging
+            messages.error(request, "❌ There was an error in the form. Please check the inputs.")
     else:
         form = UserRegistrationForm()
 
     return render(request, 'accounts/register_user.html', {'form': form})
+
 
 @login_required
 def edit_profile(request):
@@ -252,7 +261,156 @@ def telephone_directory(request):
 
 
 def company_information(request):
-    return render(request, 'accounts/company_information.html')
+    # Example company data (this can later be stored in a model)
+    company_details = {
+        'name': 'Techiecraft Solutions GmbH',
+        'address': 'Berliner Str. 123, 10115 Berlin, Germany',
+        'phone': '+49 30 12345678',
+        'email': 'contact@techiecraft.de',
+        'website': 'https://www.techiecraft.de',
+        'founded': '2015',
+        'employees': '150+',
+        'mission': 'Delivering cutting-edge tech solutions to businesses worldwide.',
+        'vision': 'To be the leading provider of IT innovations in Europe.',
+    }
+    
+    return render(request, 'accounts/company_information.html', {'company_details': company_details})
+
+
+def company_calendar(request):
+    """Show all events in the company calendar"""
+    events = Event.objects.all().order_by("start_time")  # Fetch all events sorted by date
+    return render(request, "accounts/company_calendar.html", {"events": events})
+
+
+from django.utils.timezone import now, make_aware
+from datetime import timedelta
+from accounts.models import Event
+
+def company_calendar_view(request, view_type):
+    """Display different views of the company calendar based on the selected filter."""
+    today = now().date()
+    events = Event.objects.all()
+    start_date, end_date = None, None
+
+    if view_type == "this_week":
+        start_date = today - timedelta(days=today.weekday())  # Monday
+        end_date = start_date + timedelta(days=6)  # Sunday
+        events = events.filter(start_time__date__gte=start_date, end_time__date__lte=end_date)
+        title = "📅 This Week's Schedule"
+
+    elif view_type == "org_units":
+        events = events.filter(event_type="Work Shift")
+        title = "🏢 By Organizational Units"
+
+    elif view_type == "superior":
+        events = events.filter(event_type="Meeting")
+        title = "👨‍💼 By Superior"
+
+    elif view_type == "person":
+        events = events.filter(event_type="General")
+        title = "🙋 Individual Person Selection"
+
+    elif view_type == "group":
+        events = events.filter(event_type="Group Meeting")
+        title = "👥 Individual Group Selection"
+
+    elif view_type == "attendance":
+        title = "📊 Attendance Overview"
+
+    else:
+        title = "📅 Company Calendar"
+
+    # ✅ Debugging: Print the retrieved events
+    print(f"🔍 Retrieved Events for {view_type}: {events}")
+
+    context = {
+        'title': title,
+        'events': events,
+        'start_date': start_date.strftime('%b %d, %Y') if start_date else None,
+        'end_date': end_date.strftime('%b %d, %Y') if end_date else None
+    }
+
+    return render(request, 'accounts/company_calendar_view.html', context)
+
+
+@login_required
+def add_event(request):
+    """Handles adding a new event to the calendar"""
+    if request.method == "POST":
+        title = request.POST.get("title")
+        event_type = request.POST.get("event_type")
+        start_time = request.POST.get("start_time")
+        end_time = request.POST.get("end_time")
+        location = request.POST.get("location", "")
+
+        # Debugging: Print values to terminal
+        print(f"🔍 Received Data -> Title: {title}, Type: {event_type}, Start: {start_time}, End: {end_time}, Location: {location}")
+
+        # Ensure start_time and end_time are not None
+        if not start_time or not end_time:
+            messages.error(request, "❌ Start time and end time are required!")
+            return redirect("add_event")
+
+        # Parse datetime safely
+        start_time_parsed = parse_datetime(start_time)
+        end_time_parsed = parse_datetime(end_time)
+
+        if not start_time_parsed or not end_time_parsed:
+            messages.error(request, "❌ Invalid date format! Please use the correct datetime format.")
+            return redirect("add_event")
+
+        # Convert to timezone-aware datetime
+        start_time_aware = make_aware(start_time_parsed)
+        end_time_aware = make_aware(end_time_parsed)
+
+        # Create event
+        Event.objects.create(
+            title=title,
+            event_type=event_type,
+            start_time=start_time_aware,
+            end_time=end_time_aware,
+            location=location,
+            created_by=request.user,
+        )
+
+        messages.success(request, "✅ Event successfully added!")
+        return redirect("company_calendar_view", view_type="this_week")
+
+    return render(request, "accounts/add_event.html")
+
+
+
+@login_required
+def edit_event(request, event_id):
+    """Allows admins to edit an event."""
+    event = get_object_or_404(Event, id=event_id)
+
+    if request.method == "POST":
+        form = EventForm(request.POST, instance=event)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "✅ Event updated successfully!")
+            return redirect("company_calendar_view", view_type="this_week")
+
+    else:
+        form = EventForm(instance=event)
+
+    return render(request, "accounts/edit_event.html", {"form": form, "event": event})
+
+@login_required
+def delete_event(request, event_id):
+    """Allows admins to delete an event."""
+    event = get_object_or_404(Event, id=event_id)
+
+    if request.user.is_superuser:
+        event.delete()
+        messages.success(request, "❌ Event deleted successfully!")
+    else:
+        messages.error(request, "🚫 You do not have permission to delete this event.")
+
+    return redirect("company_calendar_view", view_type="this_week")
+
 
 def company_calendar_this_week(request):
     return render(request, 'accounts/company_calendar_this_week.html')

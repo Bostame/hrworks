@@ -1,8 +1,20 @@
-{% extends 'accounts/base.html' %}
+{% extends "accounts/base.html" %}
+{% block title %}Company Information{% endblock %}
 
 {% block content %}
-    <div class="container mt-4">
-        <h2>Page Coming Soon</h2>
-        <p>This section is under development.</p>
+<div class="container mt-5">
+    <h2 class="fw-bold text-center mb-4">🏢 Company Information</h2>
+
+    <div class="card shadow-sm p-4">
+        <h4 class="fw-bold">{{ company_details.name }}</h4>
+        <p><strong>📍 Address:</strong> {{ company_details.address }}</p>
+        <p><strong>📞 Phone:</strong> {{ company_details.phone }}</p>
+        <p><strong>📧 Email:</strong> <a href="mailto:{{ company_details.email }}">{{ company_details.email }}</a></p>
+        <p><strong>🌐 Website:</strong> <a href="{{ company_details.website }}" target="_blank">{{ company_details.website }}</a></p>
+        <p><strong>📅 Founded:</strong> {{ company_details.founded }}</p>
+        <p><strong>👥 Employees:</strong> {{ company_details.employees }}</p>
+        <p><strong>🎯 Mission:</strong> {{ company_details.mission }}</p>
+        <p><strong>🔮 Vision:</strong> {{ company_details.vision }}</p>
     </div>
+</div>
 {% endblock %}

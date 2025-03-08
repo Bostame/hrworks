@@ -92,3 +92,23 @@ class TimeTracking(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.date} - {self.total_hours} hours"
+
+
+class Event(models.Model):
+    title = models.CharField(max_length=255)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField(null=True, blank=True)
+    event_type = models.CharField(
+        max_length=50,
+        choices=[
+            ("Meeting", "Meeting"),
+            ("Work Shift", "Work Shift"),
+            ("General", "General"),
+            ("Holiday", "Holiday"),
+        ]
+    )
+    location = models.CharField(max_length=255, blank=True, null=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return f"{self.title} ({self.start_time.strftime('%Y-%m-%d %H:%M')})"

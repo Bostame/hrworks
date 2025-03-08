@@ -137,6 +137,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # Storage path for `collectstatic`
 
 TIME_ZONE = 'Europe/Berlin'  # Set to your local timezone
 USE_TZ = True  # This should be True to enable timezone-aware datetimes
+AUTH_USER_MODEL = "accounts.CustomUser"  # ✅ Ensure this is set correctly

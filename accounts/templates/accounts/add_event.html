@@ -1,0 +1,45 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}Add Event{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="fw-bold text-center">📅 Add New Event</h2>
+
+    <!-- Ensure the form is properly structured -->
+    <form method="POST" action="{% url 'add_event' %}" class="mt-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">Event Title</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Event Type</label>
+            <select name="event_type" class="form-select">
+                <option value="Work Shift">Work Shift</option>
+                <option value="Meeting">Meeting</option>
+                <option value="General">General</option>
+                <option value="Group Meeting">Group Meeting</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Start Time</label>
+            <input type="datetime-local" name="start_time" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">End Time</label>
+            <input type="datetime-local" name="end_time" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Location (Optional)</label>
+            <input type="text" name="location" class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Save Event</button>
+    </form>
+</div>
+{% endblock %}
