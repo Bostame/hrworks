@@ -10,7 +10,11 @@ from decimal import Decimal  # Import Decimal
 from django.db.models import Sum
 import json
 from django.http import JsonResponse
-from .models import TimeTracking
+import io
+from django.http import FileResponse
+from reportlab.pdfgen import canvas
+from django.core.paginator import Paginator
+from .models import CustomUser
 
 @login_required
 def register_user(request):
@@ -166,16 +170,6 @@ def get_live_hours(request):
     return JsonResponse({"hours_worked": round(total_today_hours, 2), "clocked_in": clocked_in})
 
 
-
-import io
-import json
-from django.http import FileResponse
-from reportlab.pdfgen import canvas
-from django.utils.timezone import now
-from django.db.models import Sum
-from django.contrib.auth.decorators import login_required
-from accounts.models import TimeTracking
-
 @login_required
 def export_pdf(request):
     user = request.user
@@ -233,7 +227,29 @@ def export_pdf(request):
 
 
 def telephone_directory(request):
-    return render(request, 'accounts/telephone_directory.html')
+    query = request.GET.get('q', '')  # Get search query
+    employees = CustomUser.objects.filter(is_active=True).order_by('id')  # ✅ Ordered for consistent pagination
+
+    # Apply search filter
+    if query:
+        employees = employees.filter(
+            first_name__icontains=query
+        ) | employees.filter(
+            last_name__icontains=query
+        ) | employees.filter(
+            email__icontains=query
+        ) | employees.filter(
+            office_phone__icontains=query
+        )
+
+    # Pagination (10 employees per page)
+    paginator = Paginator(employees, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'accounts/telephone_directory.html', {'page_obj': page_obj, 'query': query})
+
+
 
 def company_information(request):
     return render(request, 'accounts/company_information.html')

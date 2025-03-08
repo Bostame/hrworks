@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
-from .views import clock_in, clock_out, dashboard, get_live_hours, export_pdf
+from .views import clock_in, clock_out, dashboard, get_live_hours, export_pdf, telephone_directory
 
 urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='accounts/login.html'), name='login'),
