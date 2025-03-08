@@ -137,3 +137,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
+TIME_ZONE = 'Europe/Berlin'  # Set to your local timezone
+USE_TZ = True  # This should be True to enable timezone-aware datetimes

@@ -3,8 +3,105 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-    <div class="text-center">
-        <h2 class="fw-bold">Welcome, {{ user.first_name }} {{ user.last_name }}!</h2>
-        <p class="lead">This is your personal dashboard.</p>
+<div class="container mt-4">
+    <h2 class="fw-bold">Dashboard</h2>
+
+    <!-- Quick Overview Card -->
+    <div class="card shadow-sm border-0 p-3 mb-4">
+        <h5 class="fw-bold text-left">Quick Overview</h5>
+        <div class="d-flex flex-wrap justify-content-between">
+            <p><i class="fa fa-clock text-primary"></i> Hours Worked Today: <strong>{{ hours_worked|floatformat:2 }}h</strong></p>
+            <p><i class="fa fa-stopwatch text-danger"></i> Overtime: <strong>{{ total_overtime_month|floatformat:2 }}h</strong></p>
+            <p><i class="fa fa-umbrella text-success"></i> Vacation Remaining: <strong>{{ vacation_balance }} days</strong></p>
+            <p><i class="fa fa-calendar-alt text-info"></i> Monthly Work: <strong>{{ total_hours_month|floatformat:2 }}h</strong></p>
+        </div>
     </div>
+
+    <!-- Responsive Grid for Charts -->
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col">
+            <div class="card shadow-sm border-0 p-3 text-center">
+                <h6 class="fw-bold">Today's Hours</h6>
+                <canvas id="dailyHoursChart"></canvas>
+                <p class="text-center mt-2">{{ hours_worked|floatformat:2 }}h / 10h max</p>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card shadow-sm border-0 p-3 text-center">
+                <h6 class="fw-bold">Monthly Hours</h6>
+                <canvas id="monthlyHoursChart"></canvas>
+                <p class="text-center mt-2">{{ total_hours_month|floatformat:2 }}h / 160h max</p>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card shadow-sm border-0 p-3 text-center">
+                <h6 class="fw-bold">Overtime</h6>
+                <canvas id="overtimeChart"></canvas>
+                <p class="text-center mt-2">{{ total_overtime_month|floatformat:2 }}h / 20h max</p>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card shadow-sm border-0 p-3 text-center">
+                <h6 class="fw-bold">Vacation Used</h6>
+                <canvas id="vacationUsedChart"></canvas>
+                <p class="text-center mt-2">{{ vacation_days_used }}d used / 30d total</p>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card shadow-sm border-0 p-3 text-center">
+                <h6 class="fw-bold">Vacation Balance</h6>
+                <canvas id="vacationBalanceChart"></canvas>
+                <p class="text-center mt-2">{{ vacation_balance }}d remaining</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        try {
+            let chartData = JSON.parse('{{ charts|escapejs }}');
+
+            function createChart(canvasId, worked, max, color) {
+                const ctx = document.getElementById(canvasId);
+                if (!ctx) return;
+
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Used', 'Remaining'],
+                        datasets: [{
+                            data: [worked, max - worked],
+                            backgroundColor: [color, '#ecf0f1'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        cutout: '65%',
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { enabled: true },
+                        }
+                    }
+                });
+            }
+
+            // Create charts dynamically
+            chartData.forEach(chart => {
+                createChart(chart.chart_id, chart.worked, chart.max, chart.color);
+            });
+
+        } catch (error) {
+            console.error("Error parsing chart data:", error);
+        }
+    });
+</script>
+
 {% endblock %}

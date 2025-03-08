@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
+from django.utils.timezone import now
+from datetime import timedelta
 
 class CustomUser(AbstractUser):
     # Personal Details
@@ -9,7 +11,7 @@ class CustomUser(AbstractUser):
     citizenship = models.CharField(max_length=100, blank=True, null=True)
     salutation = models.CharField(
         max_length=10,
-        choices=[('Mr.', 'Mr.'), ('Ms.', 'Ms.'), ('Dr.', 'Dr.'), ('Prof.', 'Prof.')],
+        choices=[('Mr.', 'Mr.',), ('Ms.', 'Ms.'), ('Dr.', 'Dr.'), ('Prof.', 'Prof.')],
         blank=True,
         null=True
     )
@@ -55,14 +57,38 @@ class CustomUser(AbstractUser):
     # Health Insurance
     health_insurance = models.CharField(max_length=255, blank=True, null=True)
 
+    # **Vacation Tracking**
+    vacation_balance = models.IntegerField(default=30)  # Start with 30 vacation days
+
     def get_profile_picture(self):
         if self.profile_picture:
             return self.profile_picture.url
         return f"{settings.MEDIA_URL}profile_pictures/default_profile.png"  # Ensures correct URL for default image
 
+    def deduct_vacation(self, days=1):
+        """Deducts vacation days if available."""
+        if self.vacation_balance > 0:
+            self.vacation_balance -= days
+            self.save()
 
+    def __str__(self):
+        return self.username
 
-    
+class TimeTracking(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    date = models.DateField(default=now)
+    clock_in = models.DateTimeField(null=True, blank=True)
+    clock_out = models.DateTimeField(null=True, blank=True)
+    total_hours = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    overtime = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
 
+    def calculate_hours(self):
+        """Calculates total hours worked for the day considering multiple clock-ins."""
+        if self.clock_in and self.clock_out:
+            worked_hours = (self.clock_out - self.clock_in).total_seconds() / 3600  # Convert to hours
+            self.total_hours += round(worked_hours, 2)  # Accumulate total hours
+            self.overtime = max(0, self.total_hours - 8)  # Overtime calculation
+        self.save()
 
-    
+    def __str__(self):
+        return f"{self.user.username} - {self.date} - {self.total_hours} hours"

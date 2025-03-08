@@ -17,37 +17,66 @@
         <a class="navbar-brand" href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}">
             <img src="https://bostame.de/wp-content/uploads/2024/05/logo-bostame.png" height="50px" alt="Company Logo" class="rounded-circle">
             <span class="ms-2 fw-bold">Techiecraft</span>
-        </a>        
-    
-        <!-- User Profile Dropdown (Right) -->
-        {% if user.is_authenticated %}
-        <div class="ms-auto position-relative">
-            <div class="dropdown">
-                <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="{{ user.get_profile_picture }}" class="rounded-circle" width="40" height="40" alt="Profile Picture">
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end shadow p-3" aria-labelledby="profileDropdown" style="width: 250px;">
-                    <li class="text-center">
-                        <img src="{{ user.get_profile_picture }}" class="rounded-circle mb-2" width="60" height="60" alt="Profile Picture">
-                        <h6 class="fw-bold mb-0">{{ user.first_name }} {{ user.last_name }}</h6>
-                        <p class="text-muted small">{{ user.email }}</p>
-                    </li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="{% url 'my_profile' %}"><i class="fa fa-user-circle"></i> My Profile</a></li>
-                    {% if user.is_superuser %}
-                        <li><a class="dropdown-item" href="{% url 'register_user' %}"><i class="fa fa-user-plus"></i> Register User</a></li>
+        </a>
+
+        <!-- Navbar Items -->
+        <div class="d-flex ms-auto align-items-center">
+            <!-- Time Tracker UI (Only visible on the dashboard) -->
+            {% if request.path == '/dashboard/' %}
+            <div class="d-inline-flex align-items-center me-3">
+                <!-- Compact Time Tracker UI with consistent styling -->
+                <div class="d-inline-flex align-items-center bg-white rounded-pill p-2 px-3 shadow-sm">
+                    <!-- Play/Pause Button -->
+                    <a href="{% if clocked_in %}{% url 'clock_out' %}{% else %}{% url 'clock_in' %}{% endif %}"
+                       class="rounded-circle d-flex align-items-center justify-content-center text-white"
+                       style="width: 40px; height: 40px; background-color: {% if clocked_in %}#dc3545{% else %}#007bff{% endif %};">
+                        <i class="fa {% if clocked_in %}fa-pause{% else %}fa-play{% endif %}"></i>
+                    </a>
+        
+                    <!-- Hours Worked Today -->
+                    <span class="ms-3 fw-bold text-dark">
+                        <span id="elapsed-time">{{ hours_worked|floatformat:2 }}</span> Hours
+                    </span>
+        
+                    <!-- Clock-In Time Display (Only if clocked in) -->
+                    {% if clocked_in %}
+                        <span class="ms-2 text-muted">Since <strong>{{ clock_in_time }}</strong></span>
                     {% endif %}
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                        <form action="{% url 'logout' %}" method="post">
-                            {% csrf_token %}
-                            <button class="btn btn-danger w-100"><i class="fa fa-sign-out-alt"></i> Log off</button>
-                        </form>
-                    </li>
-                </ul>
+                </div>
             </div>
+            {% endif %}
+
+            <!-- User Profile Dropdown (Right) -->
+            {% if user.is_authenticated %}
+            <div class="ms-auto position-relative">
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <!-- Profile Picture with rounded corners -->
+                        <img src="{{ user.get_profile_picture }}" class="rounded-pill" width="45" height="45" alt="Profile Picture">
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow p-3" aria-labelledby="profileDropdown" style="width: 250px;">
+                        <li class="text-center">
+                            <img src="{{ user.get_profile_picture }}" class="rounded-pill mb-2" width="50" height="50" alt="Profile Picture">
+                            <h6 class="fw-bold mb-0">{{ user.first_name }} {{ user.last_name }}</h6>
+                            <p class="text-muted small">{{ user.email }}</p>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'my_profile' %}"><i class="fa fa-user-circle"></i> My Profile</a></li>
+                        {% if user.is_superuser %}
+                            <li><a class="dropdown-item" href="{% url 'register_user' %}"><i class="fa fa-user-plus"></i> Register User</a></li>
+                        {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="{% url 'logout' %}" method="post">
+                                {% csrf_token %}
+                                <button class="btn btn-danger w-100"><i class="fa fa-sign-out-alt"></i> Log off</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
     </nav>
 
     <!-- Page Content -->
