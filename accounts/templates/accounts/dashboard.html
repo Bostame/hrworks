@@ -23,7 +23,7 @@
             <div class="card shadow-sm border-0 p-3 text-center">
                 <h6 class="fw-bold">Today's Hours</h6>
                 <canvas id="dailyHoursChart"></canvas>
-                <p class="text-center mt-2">{{ hours_worked|floatformat:2 }}h / 10h max</p>
+                <p class="text-center mt-2"><span id="live-hours">{{ hours_worked|floatformat:2 }}</span>h / 10h max</p>
             </div>
         </div>
 
@@ -58,7 +58,21 @@
                 <p class="text-center mt-2">{{ vacation_balance }}d remaining</p>
             </div>
         </div>
+
+
+        <div class="col">
+            <div class="card shadow-sm border-0 p-3 text-center">
+                    <a href="{% url 'export_pdf' %}" class="btn btn-primary">
+                        <i class="fa fa-download"></i> Export as PDF
+                    </a>
+            </div>
+        </div>
+
+
+
     </div>
+
+    
 </div>
 
 <!-- Chart.js Script -->
@@ -103,5 +117,32 @@
         }
     });
 </script>
+
+
+<script>
+    function updateLiveHours() {
+        fetch("{% url 'get_live_hours' %}")  // Call Django API
+            .then(response => response.json())
+            .then(data => {
+                if (data.clocked_in) {
+                    // Update the "Today's Hours" text
+                    document.getElementById("live-hours").innerText = data.hours_worked.toFixed(2) + "h";
+
+                    // Update the chart dynamically
+                    let dailyChart = Chart.getChart("dailyHoursChart");
+                    if (dailyChart) {
+                        dailyChart.data.datasets[0].data[0] = data.hours_worked;
+                        dailyChart.data.datasets[0].data[1] = Math.max(10 - data.hours_worked, 0);
+                        dailyChart.update();
+                    }
+                }
+            })
+            .catch(error => console.error("Error fetching live hours:", error));
+    }
+
+    // Run every 10 seconds (10,000ms)
+    setInterval(updateLiveHours, 10000);
+</script>
+
 
 {% endblock %}

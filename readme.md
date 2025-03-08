@@ -1,88 +1,101 @@
-Here's a **README.md** file summarizing everything we have done so far in your Django project:  
+Here's your **updated README.md** including **all new features** like **time tracking, role-based dashboards, PDF export, and charts.**
 
 ---
 
 ```md
-# HRWorks - Django Web Application
+# HRWorks - Employee Time Tracking System 🕒📊
 
 ## 🚀 Project Overview
-HRWorks is a Django-based web application for managing employee data, user authentication, and role-based access. The project includes user registration, profile management, dashboard views, and Bootstrap-enhanced UI.
+HRWorks is a **Django-based web application** for **employee time tracking**, **vacation management**, and **work hour reporting**. Employees can **clock in & out**, **track overtime**, **view their statistics via interactive charts**, and **export work reports as PDFs**.
 
 ---
 
 ## 📌 Features Implemented
 
-### **1. Authentication System**
-- ✅ **Login System** with a user-friendly interface.
-- ✅ **Logout Functionality** with CSRF protection.
-- ✅ **Role-based Access**:
-  - Admins can add new users.
-  - Regular users can only view and edit their own data.
+### **1️⃣ Authentication System**
+✔️ **Login & Logout** system with CSRF protection  
+✔️ **Admin-Only Registration** – Employees are created by an admin  
+✔️ **Role-Based Access Control**:
+   - **Admins** manage users & view reports
+   - **Employees** track their own work hours
 
-### **2. User Dashboard**
-- ✅ **Dashboard with Navbar**:
-  - Company logo (left).
-  - Profile dropdown (right) with:
-    - View Profile Data
-    - Add New User (Admins only)
-    - Logout
-- ✅ **Personalized Welcome Message**.
+---
 
-### **3. User Profile Management**
-- ✅ **View Profile Page**:
-  - Displays all user data in a structured format.
-  - Includes employment, contact, and wage details.
-- ✅ **Edit Profile Page**:
-  - Allows users to update their information.
-  - Success message displayed upon saving.
-- ✅ **Profile Picture Upload**:
-  - Users can upload profile pictures.
-  - Defaults to `default_profile.png` if none is provided.
+### **2️⃣ Employee Dashboard**
+✔️ **Compact Time Tracker in Navbar**
+   - **Clock In / Clock Out** button (Play/Pause)
+   - **Live hours worked today**
+   - **Clock-in timestamp** displayed  
 
-### **4. User Registration**
-- ✅ **Admin-Only User Creation**:
-  - Admins can register new users.
-  - Form structured with Bootstrap styling.
-- ✅ **Includes Fields**:
-  - Personal details (Name, DOB, Citizenship, etc.).
-  - Contact details (Email, Phone, Emergency Contact).
-  - Employment details (Position, Start Date, etc.).
-  - Wage data (Tax ID, Child Allowance, etc.).
-  - Password fields.
+✔️ **Work Overview Panel**
+   - **Hours Worked Today**
+   - **Overtime Calculation**
+   - **Vacation Days Remaining**
+   - **Monthly Work Hours Overview**
 
-### **5. Enhanced UI with Bootstrap**
-- ✅ **Consistent Navbar on All Pages**:
-  - Hidden profile dropdown when user is not logged in.
-  - Clicking the company logo redirects to:
-    - Dashboard (if logged in).
-    - Login page (if not authenticated).
-- ✅ **Login Page Redesign**:
-  - Centered form with Bootstrap styling.
-  - Welcome message and logo at the top.
-  - Improved form fields with placeholders.
+✔️ **Interactive Charts (Chart.js)**
+   - **Hours Worked Today (Donut Chart)**
+   - **Total Monthly Hours**
+   - **Overtime Worked**
+   - **Vacation Used**
+   - **Vacation Balance**
 
-### **6. Profile Picture Handling**
-- ✅ **Custom Profile Picture Support**:
-  - Users can upload profile pictures.
-  - Displays uploaded picture in the navbar.
-  - Defaults to a placeholder image if none is uploaded.
+---
+
+### **3️⃣ Time Management**
+✔️ **Employees can clock in & out multiple times daily**  
+✔️ **Overtime Calculation**:
+   - 8-hour workday cap
+   - Extra hours counted as overtime  
+
+✔️ **Vacation Tracking**:
+   - Employees have **30 vacation days per year**
+   - Taking vacation **reduces balance automatically**  
+
+✔️ **Real-Time Hours Update** – No page refresh needed  
+
+---
+
+### **4️⃣ Role-Based Dashboards**
+✔️ **Admins See:**  
+   - All employees' hours & reports  
+   - Total company overtime stats  
+
+✔️ **Employees See:**  
+   - Their own hours & charts  
+
+✔️ **Nav Bar Customization:**  
+   - **Admins see additional options**
+   - **Employees have limited dashboard features**  
+
+---
+
+### **5️⃣ Export Data as PDF 📄**
+✔️ **One-Click PDF Download**  
+✔️ **Includes:**
+   - Daily Work Hours  
+   - Monthly Work Summary  
+   - Overtime Details  
+   - Vacation Balance  
+
+✔️ **Automatic Formatting** for professional reports  
 
 ---
 
 ## 📂 Folder Structure
 ```
 hrworks/
-│── accounts/                # Django app for user management
+│── accounts/                # Django app for time tracking
 │   ├── migrations/          # Database migrations
 │   ├── templates/           # HTML templates
-│   │   ├── base.html        # Base template (Navbar, Layout)
-│   │   ├── dashboard.html   # User dashboard
-│   │   ├── view_data.html   # View user data page
-│   │   ├── edit_profile.html # Edit user profile page
-│   │   ├── register.html    # Admin user registration page
+│   │   ├── base.html        # Navbar & layout
+│   │   ├── dashboard.html   # Employee dashboard
+│   │   ├── view_profile.html # Profile management
+│   │   ├── edit_profile.html # Edit profile page
+│   │   ├── register.html    # Admin user registration
 │   │   ├── login.html       # Login page
 │   ├── static/              # Static files (CSS, JS, Images)
-│── hrworks/                 # Main Django project settings
+│── hrworks/                 # Main Django settings
 │── media/                   # User-uploaded profile pictures
 │── manage.py                # Django management script
 ```
@@ -90,57 +103,76 @@ hrworks/
 ---
 
 ## 🔧 Setup Instructions
-1. **Clone the Repository**:
-   ```sh
-   git clone https://github.com/Bostame/hrworks.git
-   cd hrworks
-   ```
 
-2. **Create & Activate Virtual Environment**:
-   ```sh
-   python -m venv venv
-   source venv/bin/activate  # For macOS/Linux
-   venv\Scripts\activate     # For Windows
-   ```
+### **1️⃣ Clone the Repository**
+```sh
+git clone https://github.com/Bostame/hrworks.git
+cd hrworks
+```
 
-3. **Install Dependencies**:
-   ```sh
-   pip install -r requirements.txt
-   ```
+### **2️⃣ Set Up the Virtual Environment**
+```sh
+python -m venv venv
+source venv/bin/activate  # For macOS/Linux
+venv\Scripts\activate     # For Windows
+```
 
-4. **Run Migrations**:
-   ```sh
-   python manage.py makemigrations
-   python manage.py migrate
-   ```
+### **3️⃣ Install Dependencies**
+```sh
+pip install -r requirements.txt
+```
 
-5. **Run the Development Server**:
-   ```sh
-   python manage.py runserver
-   ```
+### **4️⃣ Apply Migrations**
+```sh
+python manage.py makemigrations
+python manage.py migrate
+```
 
-6. **Access the Application**:
-   - Open [http://127.0.0.1:8000/login/](http://127.0.0.1:8000/login/) to log in.
+### **5️⃣ Create a Superuser**
+```sh
+python manage.py createsuperuser
+```
+
+### **6️⃣ Run the Development Server**
+```sh
+python manage.py runserver
+```
+
+### **7️⃣ Access the Application**
+- Open [http://127.0.0.1:8000/login/](http://127.0.0.1:8000/login/)  
+- **Admin users** can log in and manage employees  
+- **Employees** track their work hours  
 
 ---
 
-## 🔧 Upcoming Enhancements
-🔹 **Forgot Password Feature**  
-🔹 **User Role Management**  
-🔹 **Dynamic Dashboard Widgets**  
-🔹 **Better Styling & Responsiveness**  
+## 🎯 How to Use
+
+### **Clocking In & Out**
+1. **Navigate to the Dashboard**  
+2. Click the **Play/Pause** button in the navbar  
+3. The system **records your working hours** automatically  
+
+### **Downloading Work Reports**
+1. Click **"Download Work Report (PDF)"**  
+2. The system **generates a PDF** with work details  
+
+---
+
+## 🚀 Upcoming Enhancements
+🔹 **Export Data as CSV**  
+🔹 **Automated Email Reports**  
+🔹 **Advanced Admin Insights**  
+🔹 **Integrations with HR Systems**  
 
 ---
 
 ## 📜 License
-This project is for internal use. No public distribution permitted.
+This project is for internal company use only. No public distribution permitted.
 
 ---
 
 💡 **Developed by:** Md Bayazid Bostame  
-📅 **Last Updated:** March 6, 2025  
+📅 **Last Updated:** March 8, 2025  
 ```
 
 ---
-
-This **README.md** file gives a structured overview of the project, covering all the features you have implemented so far. It also includes **setup instructions**, **folder structure**, and **next steps**. 🚀

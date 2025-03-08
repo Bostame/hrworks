@@ -142,3 +142,91 @@ def dashboard(request):
     }
 
     return render(request, "accounts/dashboard.html", context)
+
+
+@login_required
+def get_live_hours(request):
+    """ API Endpoint to fetch live working hours """
+    user = request.user
+    today = now().date()
+
+    # Get today's working hours
+    today_entries = TimeTracking.objects.filter(user=user, date=today)
+    total_today_hours = 0
+    clocked_in = False
+
+    for entry in today_entries:
+        if entry.clock_in and entry.clock_out:
+            total_today_hours += float(entry.total_hours)
+        elif entry.clock_in and not entry.clock_out:
+            clocked_in = True
+            # Calculate active session time
+            total_today_hours += (now() - entry.clock_in).total_seconds() / 3600
+
+    return JsonResponse({"hours_worked": round(total_today_hours, 2), "clocked_in": clocked_in})
+
+
+
+import io
+import json
+from django.http import FileResponse
+from reportlab.pdfgen import canvas
+from django.utils.timezone import now
+from django.db.models import Sum
+from django.contrib.auth.decorators import login_required
+from accounts.models import TimeTracking
+
+@login_required
+def export_pdf(request):
+    user = request.user
+    today = now().date()
+
+    # Retrieve all work session data for today
+    today_entries = TimeTracking.objects.filter(user=user, date=today)
+    total_today_hours = sum(float(entry.total_hours) for entry in today_entries)
+
+    # Monthly statistics
+    first_day_of_month = today.replace(day=1)
+    month_entries = TimeTracking.objects.filter(user=user, date__gte=first_day_of_month)
+    total_hours_month = month_entries.aggregate(Sum('total_hours'))['total_hours__sum'] or 0
+    total_overtime_month = month_entries.aggregate(Sum('overtime'))['overtime__sum'] or 0
+
+    # Vacation tracking
+    vacation_balance = user.vacation_balance if hasattr(user, 'vacation_balance') else 30
+
+    # DEBUG: Print values before generating the PDF
+    print("User:", user.username)
+    print("Today's Hours:", total_today_hours)
+    print("Monthly Hours:", total_hours_month)
+    print("Overtime:", total_overtime_month)
+    print("Vacation Balance:", vacation_balance)
+
+    # Create a buffer for the PDF file
+    buffer = io.BytesIO()
+    pdf = canvas.Canvas(buffer)
+    
+    # PDF Title
+    pdf.setFont("Helvetica-Bold", 16)
+    pdf.drawString(200, 800, "Work Hours Report")
+    
+    # User Info
+    pdf.setFont("Helvetica", 12)
+    pdf.drawString(100, 760, f"User: {user.first_name} {user.last_name}")
+    pdf.drawString(100, 740, f"Report Date: {today}")
+
+    # Work Hours Data
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.drawString(100, 700, "Work Summary")
+    pdf.setFont("Helvetica", 11)
+    pdf.drawString(100, 680, f"Today's Hours: {total_today_hours:.2f}h")
+    pdf.drawString(100, 660, f"Monthly Hours: {total_hours_month:.2f}h")
+    pdf.drawString(100, 640, f"Overtime: {total_overtime_month:.2f}h")
+    pdf.drawString(100, 620, f"Vacation Balance: {vacation_balance} days")
+
+    # Finalize the PDF
+    pdf.showPage()
+    pdf.save()
+    buffer.seek(0)
+
+    # Return the PDF as a downloadable file
+    return FileResponse(buffer, as_attachment=True, filename=f"work_hours_report_{user.username}.pdf")
