@@ -1,8 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser
+from accounts.models import Event
 
 class UserRegistrationForm(UserCreationForm):
+    role = forms.ChoiceField(choices=CustomUser.ROLE_CHOICES, required=True)
     profile_picture = forms.ImageField(required=False)
     date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     place_of_birth = forms.CharField(max_length=255)
@@ -39,7 +41,7 @@ class UserRegistrationForm(UserCreationForm):
     class Meta:
         model = CustomUser
         fields = [
-            'username', 'first_name', 'last_name', 'profile_picture', 'salutation', 'date_of_birth', 'place_of_birth',
+            'username', 'first_name', 'last_name', 'profile_picture', 'salutation', 'role', 'date_of_birth', 'place_of_birth',
             'citizenship', 'email', 'private_email', 'office_phone', 'private_mobile', 'emergency_contact',
             'current_position', 'seniority', 'start_date', 'end_date', 'social_security_number',
             'tax_identification_number', 'highest_school_certificate', 'highest_professional_qualification',
@@ -52,15 +54,23 @@ class UserEditForm(forms.ModelForm):
     profile_picture = forms.ImageField(required=False)
     child_birthdate = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
 
+    def __init__(self, *args, **kwargs):
+        self.editor = kwargs.pop('editor', None)  # Capture the logged-in user (editor)
+        super().__init__(*args, **kwargs)
+
+        # ✅ Only show role field if the editor is HR, CEO, or Superuser
+        if self.editor and (self.editor.is_superuser or self.editor.role in ['HR', 'CEO']):
+            self.fields['role'] = forms.ChoiceField(choices=CustomUser.ROLE_CHOICES, required=True)
+
     class Meta:
         model = CustomUser
         fields = [
-            'profile_picture', 'first_name', 'last_name', 'salutation', 'date_of_birth', 'place_of_birth', 'citizenship',
-            'private_email', 'office_phone', 'private_mobile', 'emergency_contact',
-            'current_position', 'seniority', 'start_date', 'end_date',
-            'social_security_number', 'tax_identification_number', 'highest_school_certificate', 
-            'highest_professional_qualification', 'tax_class', 'child_allowance',
-            'address', 'bank_account', 'child_name', 'child_birthdate', 'health_insurance'
+            'username', 'profile_picture', 'first_name', 'last_name', 'salutation', 'role', 'date_of_birth', 'place_of_birth', 
+            'citizenship', 'email', 'private_email', 'office_phone', 'private_mobile', 'emergency_contact',
+            'current_position', 'seniority', 'start_date', 'end_date', 'social_security_number', 
+            'tax_identification_number', 'highest_school_certificate', 'highest_professional_qualification', 
+            'tax_class', 'child_allowance', 'address', 'bank_account', 'child_name', 'child_birthdate', 
+            'health_insurance'
         ]
         widgets = {
             'date_of_birth': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
@@ -69,8 +79,7 @@ class UserEditForm(forms.ModelForm):
             'child_birthdate': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
 
-from django import forms
-from accounts.models import Event
+
 
 class EventForm(forms.ModelForm):
     class Meta:

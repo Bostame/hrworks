@@ -1,11 +1,17 @@
 {% extends 'accounts/base.html' %}
 {% load widget_tweaks %}
 
-{% block title %}Edit Profile{% endblock %}
+{% block title %}Edit {{ user.username }}'s Profile{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center fw-bold mb-4">Edit Profile</h2>
+    <h2 class="text-center fw-bold mb-4">
+        {% if user.id == request.user.id %}
+            Edit Your Profile
+        {% else %}
+            Edit {{ user.username }}'s Profile
+        {% endif %}
+    </h2>    
 
     {% if messages %}
         {% for message in messages %}
@@ -27,48 +33,142 @@
 
         <!-- Profile Picture Upload -->
         <div class="mb-3">
-            <label class="form-label">Profile Picture</label>
+            <label class="form-label">{{ form.profile_picture.label }}</label>
             {{ form.profile_picture|add_class:"form-control" }}
         </div>
 
         <!-- Personal Details -->
         <h3 class="mt-3">Personal Details</h3>
         <div class="row">
-            <div class="col-md-6 mb-3">{{ form.first_name|add_class:"form-control" }}</div>
-            <div class="col-md-6 mb-3">{{ form.last_name|add_class:"form-control" }}</div>
-            <div class="col-md-6 mb-3">{{ form.salutation|add_class:"form-select" }}</div>
-            <div class="col-md-6 mb-3">{{ form.date_of_birth|add_class:"form-control" }}</div>
-            <div class="col-md-6 mb-3">{{ form.place_of_birth|add_class:"form-control" }}</div>
-            <div class="col-md-6 mb-3">{{ form.citizenship|add_class:"form-control" }}</div>
-        </div>
+            <div class="col-md-6 mb-3">
+                {{ form.username.label_tag }}
+                {{ form.username|add_class:"form-control" }}
+            </div>
 
-        <!-- Address -->
-        <h3 class="mt-3">Address</h3>
-        <div class="mb-3">{{ form.address|add_class:"form-control" }}</div>
+            <div class="col-md-6 mb-3">
+                {{ form.salutation.label_tag }}
+                {{ form.salutation|add_class:"form-select" }}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                {{ form.first_name.label_tag }}
+                {{ form.first_name|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.last_name.label_tag }}
+                {{ form.last_name|add_class:"form-control" }}
+            </div>
+
+            <!-- ✅ Only HR, CEO, or Superusers can edit role -->
+            {% if request.user.is_superuser or request.user.role in "HR,CEO" %}
+                <div class="col-md-6 mb-3">
+                    {{ form.role.label_tag }}
+                    {{ form.role|add_class:"form-select" }}
+                </div>
+            {% endif %}
+
+            <div class="col-md-6 mb-3">
+                {{ form.date_of_birth.label_tag }}
+                {{ form.date_of_birth|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.place_of_birth.label_tag }}
+                {{ form.place_of_birth|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.citizenship.label_tag }}
+                {{ form.citizenship|add_class:"form-control" }}
+            </div>
+        </div>
 
         <!-- Contact Details -->
         <h3 class="mt-3">Contact Details</h3>
         <div class="row">
-            <div class="col-md-6 mb-3">{{ form.private_email|add_class:"form-control" }}</div>
-            <div class="col-md-6 mb-3">{{ form.office_phone|add_class:"form-control" }}</div>
-            <div class="col-md-6 mb-3">{{ form.private_mobile|add_class:"form-control" }}</div>
-            <div class="col-md-6 mb-3">{{ form.emergency_contact|add_class:"form-control" }}</div>
+            <div class="col-md-6 mb-3">
+                {{ form.email.label_tag }}
+                {{ form.email|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.private_email.label_tag }}
+                {{ form.private_email|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.office_phone.label_tag }}
+                {{ form.office_phone|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.private_mobile.label_tag }}
+                {{ form.private_mobile|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.emergency_contact.label_tag }}
+                {{ form.emergency_contact|add_class:"form-control" }}
+            </div>
+        </div>
+
+        <!-- Employment Details -->
+        <h3 class="mt-3">Employment Details</h3>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ form.current_position.label_tag }}
+                {{ form.current_position|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.seniority.label_tag }}
+                {{ form.seniority|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.start_date.label_tag }}
+                {{ form.start_date|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.end_date.label_tag }}
+                {{ form.end_date|add_class:"form-control" }}
+            </div>
+        </div>
+
+        <!-- Wage Data -->
+        <h3 class="mt-3">Wage Data</h3>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ form.social_security_number.label_tag }}
+                {{ form.social_security_number|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.tax_identification_number.label_tag }}
+                {{ form.tax_identification_number|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.highest_school_certificate.label_tag }}
+                {{ form.highest_school_certificate|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.highest_professional_qualification.label_tag }}
+                {{ form.highest_professional_qualification|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.tax_class.label_tag }}
+                {{ form.tax_class|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.child_allowance.label_tag }}
+                {{ form.child_allowance|add_class:"form-control" }}
+            </div>
+        </div>
+
+        <!-- Address -->
+        <h3 class="mt-3">Address</h3>
+        <div class="mb-3">
+            {{ form.address.label_tag }}
+            {{ form.address|add_class:"form-control" }}
         </div>
 
         <!-- Bank Account -->
         <h3 class="mt-3">Bank Account</h3>
-        <div class="mb-3">{{ form.bank_account|add_class:"form-control" }}</div>
-
-        <!-- Children Details -->
-        <h3 class="mt-3">Children</h3>
-        <div class="row">
-            <div class="col-md-6 mb-3">{{ form.child_name|add_class:"form-control" }}</div>
-            <div class="col-md-6 mb-3">{{ form.child_birthdate|add_class:"form-control" }}</div>
+        <div class="mb-3">
+            {{ form.bank_account.label_tag }}
+            {{ form.bank_account|add_class:"form-control" }}
         </div>
-
-        <!-- Health Insurance -->
-        <h3 class="mt-3">Health Insurance</h3>
-        <div class="mb-3">{{ form.health_insurance|add_class:"form-control" }}</div>
 
         <!-- Submit and Cancel Buttons -->
         <div class="d-flex justify-content-between mt-4">

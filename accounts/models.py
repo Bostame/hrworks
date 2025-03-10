@@ -5,13 +5,31 @@ from django.utils.timezone import now
 from datetime import timedelta
 
 class CustomUser(AbstractUser):
+    # Role Choices
+    CEO = 'CEO'
+    HR = 'HR'
+    TEAM_LEAD = 'Team Lead'
+    DEPUTY_LEAD = 'Deputy Lead'
+    EMPLOYEE = 'Employee'
+
+    ROLE_CHOICES = [
+        (CEO, 'CEO'),
+        (HR, 'HR'),
+        (TEAM_LEAD, 'Team Lead'),
+        (DEPUTY_LEAD, 'Deputy Lead'),
+        (EMPLOYEE, 'Employee'),
+    ]
+
+    # Role Field
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=EMPLOYEE)
+
     # Personal Details
     date_of_birth = models.DateField(null=True, blank=True)
     place_of_birth = models.CharField(max_length=255, blank=True, null=True)
     citizenship = models.CharField(max_length=100, blank=True, null=True)
     salutation = models.CharField(
         max_length=10,
-        choices=[('Mr.', 'Mr.',), ('Ms.', 'Ms.'), ('Dr.', 'Dr.'), ('Prof.', 'Prof.')],
+        choices=[('Mr.', 'Mr.'), ('Ms.', 'Ms.'), ('Dr.', 'Dr.'), ('Prof.', 'Prof.')],
         blank=True,
         null=True
     )
@@ -38,9 +56,9 @@ class CustomUser(AbstractUser):
     child_allowance = models.IntegerField(blank=True, null=True)
 
     profile_picture = models.ImageField(
-        upload_to='profile_pictures/', 
-        default='profile_pictures/default_profile.png', 
-        blank=True, 
+        upload_to='profile_pictures/',
+        default='profile_pictures/default_profile.png',
+        blank=True,
         null=True
     )
 
@@ -71,8 +89,26 @@ class CustomUser(AbstractUser):
             self.vacation_balance -= days
             self.save()
 
+    # Role-based permissions
+    def is_hr(self):
+        return self.role == self.HR or self.is_superuser  # Superusers have all roles
+
+    def is_team_lead(self):
+        return self.role == self.TEAM_LEAD or self.is_superuser
+
+    def is_deputy_lead(self):
+        return self.role == self.DEPUTY_LEAD or self.is_superuser
+
+    def is_ceo(self):
+        return self.role == self.CEO or self.is_superuser
+
+    def has_admin_privileges(self):
+        """Superusers and CEOs have full access to manage everything."""
+        return self.is_superuser or self.role == self.CEO or self.role == self.HR
+
     def __str__(self):
-        return self.username
+        return f"{self.username} - {self.role}"
+
 
 class TimeTracking(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

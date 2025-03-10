@@ -41,15 +41,54 @@ def register_user(request):
 @login_required
 def edit_profile(request):
     if request.method == 'POST':
-        form = UserEditForm(request.POST, request.FILES, instance=request.user)  # Handle image upload
+        form = UserEditForm(request.POST, request.FILES, instance=request.user, editor=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, 'Your profile has been updated successfully.')
             return redirect('dashboard')
     else:
-        form = UserEditForm(instance=request.user)
+        form = UserEditForm(instance=request.user, editor=request.user)
     
     return render(request, 'accounts/edit_profile.html', {'form': form})
+
+@login_required
+def edit_user(request, user_id):
+    """ Allows HR, CEO, and Superusers to edit any user's details. """
+    user = get_object_or_404(CustomUser, id=user_id)
+
+    # Ensure only HR, CEO, and Superusers can edit users
+    if not request.user.is_superuser and request.user.role not in ["HR", "CEO"]:
+        messages.error(request, "🚫 You do not have permission to edit users.")
+        return redirect("manage_users")
+
+    if request.method == "POST":
+        form = UserEditForm(request.POST, request.FILES, instance=user, editor=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "✅ User updated successfully!")
+            return redirect("manage_users")
+    else:
+        form = UserEditForm(instance=user, editor=request.user)
+
+    return render(request, "accounts/edit_profile.html", {"form": form, "user": user})
+
+@login_required
+def delete_user(request, user_id):
+    """ Allows only HR, CEO, and Superusers to delete users. """
+    user = get_object_or_404(CustomUser, id=user_id)
+
+    # Ensure only Superusers, HR, and CEO can delete users
+    if not request.user.is_superuser and request.user.role not in ["HR", "CEO"]:
+        messages.error(request, "🚫 You do not have permission to delete users.")
+        return redirect("manage_users")
+
+    if request.user == user:
+        messages.error(request, "🚫 You cannot delete your own account.")
+        return redirect("manage_users")
+
+    user.delete()
+    messages.success(request, "✅ User deleted successfully!")
+    return redirect("manage_users")
 
 
 @login_required
@@ -115,21 +154,21 @@ def dashboard(request):
     total_today_hours = Decimal(0)
     clocked_in = False
     clock_in_time = None
-    last_clock_in = None  # To track the last clock-in time
+    last_clock_in = None
 
     for entry in today_entries:
         if entry.clock_in and entry.clock_out:
             total_today_hours += Decimal(entry.total_hours)
         elif entry.clock_in and not entry.clock_out:
             clocked_in = True
-            last_clock_in = entry.clock_in  # Store last clock-in time
+            last_clock_in = entry.clock_in
             total_today_hours += Decimal((now() - entry.clock_in).total_seconds() / 3600)
             if clock_in_time is None:
                 clock_in_time = entry.clock_in.strftime("%H:%M")
 
-    # Calculate remaining work time (max 8 hours per day)
-    max_work_seconds = 8 * 3600  # 8 hours in seconds
-    elapsed_work_seconds = int(total_today_hours * 3600)  # Convert hours to seconds
+    # Calculate remaining work time
+    max_work_seconds = 8 * 3600
+    elapsed_work_seconds = int(total_today_hours * 3600)
     remaining_work_seconds = max(max_work_seconds - elapsed_work_seconds, 0)
 
     # Monthly statistics
@@ -150,6 +189,11 @@ def dashboard(request):
         {"chart_id": "vacationBalanceChart", "title": "Vacation Balance", "worked": float(user.vacation_balance), "max": 30, "color": "#1abc9c"},
     ])
 
+    # Role-based access control
+    is_hr = user.is_hr()
+    is_team_lead = user.is_team_lead()
+    is_ceo = user.is_ceo()
+
     context = {
         "clocked_in": clocked_in,
         "clock_in_time": clock_in_time,
@@ -158,11 +202,45 @@ def dashboard(request):
         "total_overtime_month": float(total_overtime_month),
         "vacation_balance": float(user.vacation_balance),
         "vacation_days_used": float(vacation_days_used),
-        "remaining_work_seconds": remaining_work_seconds if clocked_in else None,  # Only show countdown if clocked in
+        "remaining_work_seconds": remaining_work_seconds if clocked_in else None,
         "charts": charts,
+        "is_hr": is_hr,
+        "is_team_lead": is_team_lead,
+        "is_ceo": is_ceo,
     }
 
     return render(request, "accounts/dashboard.html", context)
+
+from django.core.paginator import Paginator
+from django.db.models import Q
+
+@login_required
+def manage_users(request):
+    """Allows HR, CEO, and Superusers to view and manage users with search and pagination."""
+    
+    if not request.user.is_superuser and request.user.role not in ["HR", "CEO"]:
+        messages.error(request, "🚫 You do not have permission to manage users.")
+        return redirect("dashboard")
+
+    query = request.GET.get("q", "").strip()  # Get and clean search query
+    users = CustomUser.objects.all().order_by('id')  # Order users by ID
+
+    # Apply search filter if query exists
+    if query:
+        users = users.filter(
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(email__icontains=query) |
+            Q(current_position__icontains=query) |
+            Q(role__icontains=query)
+        )
+
+    # ✅ Add Pagination (6 users per page for better UI)
+    paginator = Paginator(users, 6)  # Change to 6 per page for responsive design
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "accounts/manage_users.html", {"users": page_obj, "query": query})
 
 
 

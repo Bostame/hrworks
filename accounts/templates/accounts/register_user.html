@@ -32,6 +32,12 @@
                 {{ form.username.label_tag }}
                 {{ form.username|add_class:"form-control" }}
             </div>
+
+            <div class="col-md-6 mb-3">
+                {{ form.salutation.label_tag }}
+                {{ form.salutation|add_class:"form-select" }}
+            </div>
+
             <div class="col-md-6 mb-3">
                 {{ form.first_name.label_tag }}
                 {{ form.first_name|add_class:"form-control" }}
@@ -40,10 +46,12 @@
                 {{ form.last_name.label_tag }}
                 {{ form.last_name|add_class:"form-control" }}
             </div>
+            
             <div class="col-md-6 mb-3">
-                {{ form.salutation.label_tag }}
-                {{ form.salutation|add_class:"form-select" }}
+                {{ form.role.label_tag }}
+                {{ form.role|add_class:"form-select" }}
             </div>
+
             <div class="col-md-6 mb-3">
                 {{ form.date_of_birth.label_tag }}
                 {{ form.date_of_birth|add_class:"form-control" }}

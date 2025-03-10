@@ -1,0 +1,108 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="fw-bold text-center mb-4">Manage Users</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- 🔍 Search Bar -->
+    <form method="GET" action="{% url 'manage_users' %}" class="mb-4">
+        <div class="input-group shadow-sm">
+            <input type="text" class="form-control form-control-lg" name="q" 
+                placeholder="🔍 Search by name, email, or position..." value="{{ query }}">
+            <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i> Search</button>
+        </div>
+    </form>
+
+
+    <!-- Responsive Grid for User Cards -->
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for user in users %}
+        <div class="col">
+            <div class="card user-card">
+                <div class="text-center">
+                    <img src="{{ user.get_profile_picture }}" alt="Profile Picture" class="rounded-circle mb-3">
+                </div>
+                <div class="card-body">
+                    <h5 class="fw-bold">{{ user.first_name }} {{ user.last_name }}</h5>
+                    <p class="text-muted small">{{ user.email }}</p>
+                    <p><strong>Role:</strong> {{ user.role }}</p>
+                    <p><strong>Position:</strong> {{ user.current_position|default:"Not Assigned" }}</p>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-center">
+                        <a href="{% url 'edit_user' user.id %}" class="btn btn-warning btn-sm me-2">
+                            <i class="fa fa-edit"></i> Edit
+                        </a>
+
+                        {% if request.user.is_superuser or request.user.role in "HR, CEO" %}
+                            <form action="{% url 'delete_user' user.id %}" method="POST" class="d-inline-block">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm" 
+                                        onclick="return confirm('Are you sure you want to delete {{ user.username }}?');">
+                                    <i class="fa fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col text-center">
+            <p>No users found.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+   <!-- Pagination Controls -->
+    {% if users.paginator.num_pages > 1 %}
+    <nav>
+        <ul class="pagination justify-content-center">
+            {% if users.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?q={{ query }}&page=1">&laquo; First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?q={{ query }}&page={{ users.previous_page_number }}">Previous</a>
+                </li>
+            {% endif %}
+
+            <!-- Display page numbers -->
+            {% for num in users.paginator.page_range %}
+                {% if users.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > users.number|add:'-3' and num < users.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ query }}&page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if users.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?q={{ query }}&page={{ users.next_page_number }}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?q={{ query }}&page={{ users.paginator.num_pages }}">Last &raquo;</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+
+</div>
+{% endblock %}

@@ -14,3 +14,63 @@
     display: block;
     position: absolute;
 }
+
+/* User Card Styling */
+.user-card {
+    transition: transform 0.2s ease-in-out;
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.user-card:hover {
+    transform: translateY(-5px);
+}
+
+.user-card img {
+    object-fit: cover;
+    border: 3px solid #ddd;
+    width: 100px;
+    height: 100px;
+}
+
+.user-card .card-body {
+    padding: 15px;
+    text-align: center;
+}
+
+.btn-sm {
+    font-size: 14px;
+    padding: 8px 12px;
+}
+
+/* Search Bar Styling */
+.search-container {
+    max-width: 500px;
+    margin: 0 auto 20px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Pagination Styling */
+.pagination .page-link {
+    color: #007bff;
+    font-weight: bold;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+}
+
+.pagination .page-link:hover {
+    background-color: #f8f9fa;
+    border-color: #ddd;
+}

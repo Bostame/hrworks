@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
-from .views import clock_in, clock_out, dashboard, get_live_hours, export_pdf, telephone_directory, company_calendar, company_calendar_view, add_event
+from .views import manage_users, delete_user, edit_user, clock_in, clock_out, dashboard, get_live_hours, export_pdf, telephone_directory, company_calendar, company_calendar_view, add_event
 urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='accounts/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
@@ -28,6 +28,11 @@ urlpatterns = [
     path('company-overview/company-calendar/delete/<int:event_id>/', views.delete_event, name='delete_event'),
     path("company-overview/company-calendar/edit/<int:event_id>/", views.edit_event, name="edit_event"),
     path("company-overview/company-calendar/delete/<int:event_id>/", views.delete_event, name="delete_event"),
+    path("manage-users/", manage_users, name="manage_users"),  # ✅ Add this line
+    path("edit-user/<int:user_id>/", edit_user, name="edit_user"),  # ✅ New Edit User URL
+    path("delete-user/<int:user_id>/", delete_user, name="delete_user"),  # ✅ Add this
+
+
 
 
 ]
