@@ -115,15 +115,22 @@ def dashboard(request):
     total_today_hours = Decimal(0)
     clocked_in = False
     clock_in_time = None
+    last_clock_in = None  # To track the last clock-in time
 
     for entry in today_entries:
         if entry.clock_in and entry.clock_out:
             total_today_hours += Decimal(entry.total_hours)
         elif entry.clock_in and not entry.clock_out:
             clocked_in = True
+            last_clock_in = entry.clock_in  # Store last clock-in time
             total_today_hours += Decimal((now() - entry.clock_in).total_seconds() / 3600)
             if clock_in_time is None:
                 clock_in_time = entry.clock_in.strftime("%H:%M")
+
+    # Calculate remaining work time (max 8 hours per day)
+    max_work_seconds = 8 * 3600  # 8 hours in seconds
+    elapsed_work_seconds = int(total_today_hours * 3600)  # Convert hours to seconds
+    remaining_work_seconds = max(max_work_seconds - elapsed_work_seconds, 0)
 
     # Monthly statistics
     first_day_of_month = today.replace(day=1)
@@ -151,10 +158,12 @@ def dashboard(request):
         "total_overtime_month": float(total_overtime_month),
         "vacation_balance": float(user.vacation_balance),
         "vacation_days_used": float(vacation_days_used),
+        "remaining_work_seconds": remaining_work_seconds if clocked_in else None,  # Only show countdown if clocked in
         "charts": charts,
     }
 
     return render(request, "accounts/dashboard.html", context)
+
 
 
 @login_required
