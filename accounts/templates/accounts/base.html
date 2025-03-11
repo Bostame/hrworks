@@ -24,7 +24,8 @@
                 <span class="ms-2 fw-bold">Techiecraft</span>
             </a>
 
-            <!-- ✅ Company Overview Dropdown -->
+            <!-- Company Overview Dropdown -->
+            {% if user.is_authenticated %}
             <div class="dropdown ms-3">
                 <button class="btn btn-dark dropdown-toggle" type="button" id="companyOverviewDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-building"></i> Company Overview
@@ -45,6 +46,7 @@
                     </li>                    
                 </ul>
             </div>
+            {% endif %}
 
             <!-- Navbar Toggler for Mobile View -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,7 +55,7 @@
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
-                    
+
                     <!-- ✅ Time Tracker UI (Only on Dashboard) -->
                     {% if request.path == '/dashboard/' %}
                     <li class="nav-item">
@@ -76,38 +78,34 @@
                     {% endif %}
 
                     {% if user.is_authenticated %}
-                        <!-- ✅ HR, CEO & Superuser Role-Specific Links -->
-                        {% if user.role in "HR CEO" or user.is_superuser %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'register_user' %}"><i class="fa fa-user-plus"></i> Register User</a>
+                    <!-- ✅ User Profile Dropdown -->
+                    <li class="nav-item dropdown ms-3">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ user.get_profile_picture }}" class="rounded-pill me-2" width="35" height="35" alt="Profile Picture">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow p-3" aria-labelledby="profileDropdown" style="width: 250px;">
+                            <li class="text-center">
+                                <img src="{{ user.get_profile_picture }}" class="rounded-pill mb-2" width="50" height="50" alt="Profile Picture">
+                                <h6 class="fw-bold mb-0">{{ user.first_name }} {{ user.last_name }}</h6>
+                                <p class="text-muted small">{{ user.email }}</p>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'manage_users' %}"><i class="fa fa-users"></i> Manage Users</a>
+                            <li><hr class="dropdown-divider"></li>
+                            {% if user.role in "HR CEO" or user.role == "Deputy Lead" or user.is_superuser %}
+                            <li class="dropdown-header">Admin Actions</li>
+                            <li><a class="dropdown-item" href="{% url 'register_user' %}"><i class="fa fa-user-plus"></i> Register User</a></li>
+                            <li><a class="dropdown-item" href="{% url 'manage_users' %}"><i class="fa fa-users"></i> Manage Users</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="{% url 'my_profile' %}"><i class="fa fa-user-circle"></i> My Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{% url 'logout' %}" method="post">
+                                    {% csrf_token %}
+                                    <button class="btn btn-danger w-100"><i class="fa fa-sign-out-alt"></i> Log out</button>
+                                </form>
                             </li>
-                        {% endif %}
-
-                        <!-- ✅ User Profile Dropdown -->
-                        <li class="nav-item dropdown ms-3">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="{{ user.get_profile_picture }}" class="rounded-pill me-2" width="35" height="35" alt="Profile Picture">
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow p-3" aria-labelledby="profileDropdown" style="width: 250px;">
-                                <li class="text-center">
-                                    <img src="{{ user.get_profile_picture }}" class="rounded-pill mb-2" width="50" height="50" alt="Profile Picture">
-                                    <h6 class="fw-bold mb-0">{{ user.first_name }} {{ user.last_name }}</h6>
-                                    <p class="text-muted small">{{ user.email }}</p>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'my_profile' %}"><i class="fa fa-user-circle"></i> My Profile</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form action="{% url 'logout' %}" method="post">
-                                        {% csrf_token %}
-                                        <button class="btn btn-danger w-100"><i class="fa fa-sign-out-alt"></i> Log out</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
+                        </ul>
+                    </li>
                     {% endif %}
                 </ul>
             </div>

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import UserEditForm, EventForm
 from django.contrib import messages
 from .forms import UserRegistrationForm
-from django.utils.timezone import now
+from django.utils.timezone import now, make_aware
 from .models import TimeTracking, CustomUser, Event
 from datetime import timedelta
 from decimal import Decimal  # Import Decimal
@@ -15,10 +15,9 @@ from reportlab.pdfgen import canvas
 from django.core.paginator import Paginator
 from datetime import datetime
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.utils.timezone import make_aware
 from django.utils.dateparse import parse_datetime
 from django.contrib.auth.hashers import make_password
-
+from django.db.models import Q
 @login_required
 def register_user(request):
     if request.method == 'POST':
@@ -211,13 +210,12 @@ def dashboard(request):
 
     return render(request, "accounts/dashboard.html", context)
 
-from django.core.paginator import Paginator
-from django.db.models import Q
+
 
 @login_required
 def manage_users(request):
     """Allows HR, CEO, and Superusers to view and manage users with search and pagination."""
-    
+
     if not request.user.is_superuser and request.user.role not in ["HR", "CEO"]:
         messages.error(request, "🚫 You do not have permission to manage users.")
         return redirect("dashboard")
@@ -321,7 +319,7 @@ def export_pdf(request):
     # Return the PDF as a downloadable file
     return FileResponse(buffer, as_attachment=True, filename=f"work_hours_report_{user.username}.pdf")
 
-
+@login_required
 def telephone_directory(request):
     query = request.GET.get('q', '')  # Get search query
     employees = CustomUser.objects.filter(is_active=True).order_by('id')  # ✅ Ordered for consistent pagination
@@ -346,7 +344,7 @@ def telephone_directory(request):
     return render(request, 'accounts/telephone_directory.html', {'page_obj': page_obj, 'query': query})
 
 
-
+@login_required
 def company_information(request):
     # Example company data (this can later be stored in a model)
     company_details = {
@@ -363,17 +361,14 @@ def company_information(request):
     
     return render(request, 'accounts/company_information.html', {'company_details': company_details})
 
-
+@login_required
 def company_calendar(request):
     """Show all events in the company calendar"""
     events = Event.objects.all().order_by("start_time")  # Fetch all events sorted by date
     return render(request, "accounts/company_calendar.html", {"events": events})
 
 
-from django.utils.timezone import now, make_aware
-from datetime import timedelta
-from accounts.models import Event
-
+@login_required
 def company_calendar_view(request, view_type):
     """Display different views of the company calendar based on the selected filter."""
     today = now().date()
@@ -466,8 +461,6 @@ def add_event(request):
 
     return render(request, "accounts/add_event.html")
 
-
-
 @login_required
 def edit_event(request, event_id):
     """Allows admins to edit an event."""
@@ -497,7 +490,6 @@ def delete_event(request, event_id):
         messages.error(request, "🚫 You do not have permission to delete this event.")
 
     return redirect("company_calendar_view", view_type="this_week")
-
 
 def company_calendar_this_week(request):
     return render(request, 'accounts/company_calendar_this_week.html')

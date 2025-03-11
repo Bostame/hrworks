@@ -23,6 +23,12 @@ class CustomUser(AbstractUser):
     # Role Field
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=EMPLOYEE)
 
+    # Onboarding Fields
+    department = models.CharField(max_length=100, blank=True, null=True)
+    required_hardware = models.TextField(blank=True, null=True)  # List of required devices
+    required_software = models.TextField(blank=True, null=True)  # List of software
+    nextcloud_access = models.CharField(max_length=255, blank=True, null=True)  # Nextcloud group folder access
+        
     # Personal Details
     date_of_birth = models.DateField(null=True, blank=True)
     place_of_birth = models.CharField(max_length=255, blank=True, null=True)

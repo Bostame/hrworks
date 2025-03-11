@@ -4,12 +4,13 @@ from .models import CustomUser
 from accounts.models import Event
 
 class UserRegistrationForm(UserCreationForm):
+    """Form for registering a new user."""
     role = forms.ChoiceField(choices=CustomUser.ROLE_CHOICES, required=True)
     profile_picture = forms.ImageField(required=False)
-    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
-    place_of_birth = forms.CharField(max_length=255)
-    citizenship = forms.CharField(max_length=100)
-    salutation = forms.ChoiceField(choices=[('Mr.', 'Mr.'), ('Ms.', 'Ms.'), ('Dr.', 'Dr.'), ('Prof.', 'Prof.')])
+    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    place_of_birth = forms.CharField(max_length=255, required=False)
+    citizenship = forms.CharField(max_length=100, required=False)
+    salutation = forms.ChoiceField(choices=[('Mr.', 'Mr.'), ('Ms.', 'Ms.'), ('Dr.', 'Dr.'), ('Prof.', 'Prof.')], required=False)
 
     # Contact Details
     private_email = forms.EmailField(required=False)
@@ -51,6 +52,8 @@ class UserRegistrationForm(UserCreationForm):
 
 
 class UserEditForm(forms.ModelForm):
+    """Form for editing user details, with dynamic role visibility based on editor privileges."""
+    
     profile_picture = forms.ImageField(required=False)
     child_birthdate = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
 
@@ -79,9 +82,9 @@ class UserEditForm(forms.ModelForm):
             'child_birthdate': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
 
-
-
 class EventForm(forms.ModelForm):
+    """Form for adding events to the company calendar."""
+    
     class Meta:
         model = Event
         fields = ['title', 'event_type', 'start_time', 'end_time', 'location']
