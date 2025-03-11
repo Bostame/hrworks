@@ -13,23 +13,33 @@
         <div class="d-flex flex-wrap justify-content-start">
             <a href="{% url 'manage_users' %}" class="btn btn-primary me-3"><i class="fa fa-users"></i> Manage Users</a>
             <a href="{% url 'register_user' %}" class="btn btn-success me-3"><i class="fa fa-user-plus"></i> Register Employee</a>
-            <a href="{% url 'export_pdf' %}" class="btn btn-secondary"><i class="fa fa-download"></i> Export Reports</a>
         </div>
+    </div>
     {% endif %}
 
-
+    <!-- ✅ Export Reports (Visible to all employees) -->
+    {% if user.is_authenticated %}
+ 
     <!-- Quick Overview Card -->
-    <div class="card shadow-sm border-0 p-3 mb-4">
-        <h5 class="fw-bold text-left">Quick Overview</h5>
+    <div class="card shadow-sm border-0 p-3 mb-4" id="quick-overview">
+        <h5 class="fw-bold text-left">📊 Quick Overview</h5>
         <div class="d-flex flex-wrap justify-content-between">
-            <p><i class="fa fa-clock text-primary"></i> Hours Worked Today: <strong>{{ hours_worked|floatformat:2 }}h</strong></p>
-            <p><i class="fa fa-stopwatch text-danger"></i> Overtime: <strong>{{ total_overtime_month|floatformat:2 }}h</strong></p>
-            <p><i class="fa fa-umbrella text-success"></i> Vacation Remaining: <strong>{{ vacation_balance }} days</strong></p>
-            <p><i class="fa fa-calendar-alt text-info"></i> Monthly Work: <strong>{{ total_hours_month|floatformat:2 }}h</strong></p>
+            <p><i class="fa fa-clock text-primary"></i> Hours Worked Today: 
+                <strong id="quick-overview-hours">{{ hours_worked|floatformat:2 }}h</strong>
+            </p>
+            <p><i class="fa fa-stopwatch text-danger"></i> Overtime: 
+                <strong id="quick-overview-overtime">{{ total_overtime_month|floatformat:2 }}h</strong>
+            </p>
+            <p><i class="fa fa-umbrella text-success"></i> Vacation Remaining: 
+                <strong id="quick-overview-vacation">{{ vacation_balance }}</strong> days
+            </p>
+            <p><i class="fa fa-calendar-alt text-info"></i> Monthly Work: 
+                <strong id="quick-overview-monthly">{{ total_hours_month|floatformat:2 }}h</strong>
+            </p>
         </div>
     </div>
 
-    <!-- ⏳ Countdown Timer (Moved for better visibility) -->
+   <!-- ⏳ Countdown Timer (Updated for Auto Refresh) -->
     <div class="card shadow-sm border-0 p-3 text-center mb-4">
         <h6 class="fw-bold text-primary"><i class="fa fa-hourglass-half"></i> Remaining Work Time</h6>
         <p id="workday-timer" class="fs-4 fw-bold text-danger">00h 00m</p>
@@ -77,103 +87,17 @@
             </div>
         </div>
     </div>
+
+    <!-- Employee Tools Card -->
+    <div class="card shadow-sm border-0 p-3 mb-4 mt-4">
+        <h5 class="fw-bold text-left">🛠️ Employee Tools</h5>
+        <div class="d-flex flex-wrap justify-content-start">
+            <a href="{% url 'export_pdf' %}" class="btn btn-secondary me-3">
+                <i class="fa fa-download"></i> Export My Report
+            </a>
+        </div>
+    </div>
+    {% endif %}
 </div>
-
-<!-- Chart.js Script -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        try {
-            let chartData = {{ charts|safe }};
-            console.log("Chart Data:", chartData); // Debugging
-            
-            if (!Array.isArray(chartData) || chartData.length === 0) {
-                console.warn("No chart data available");
-                return;
-            }
-
-            function createChart(canvasId, worked, max, color) {
-                const ctx = document.getElementById(canvasId);
-                if (!ctx) return;
-
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Used', 'Remaining'],
-                        datasets: [{
-                            data: [worked, Math.max(max - worked, 0)],
-                            backgroundColor: [color, '#ecf0f1'],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        cutout: '65%',
-                        responsive: true,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: { enabled: true },
-                        }
-                    }
-                });
-            }
-
-            chartData.forEach(chart => {
-                createChart(chart.chart_id, chart.worked, chart.max, chart.color);
-            });
-
-        } catch (error) {
-            console.error("Error parsing chart data:", error);
-        }
-    });
-</script>
-
-<!-- Live Work Hour Tracker -->
-<script>
-    function updateLiveHours() {
-        fetch("{% url 'get_live_hours' %}")  
-            .then(response => response.json())
-            .then(data => {
-                if (data.clocked_in) {
-                    document.getElementById("live-hours").innerText = data.hours_worked.toFixed(2) + "h";
-
-                    let dailyChart = Chart.getChart("dailyHoursChart");
-                    if (dailyChart) {
-                        dailyChart.data.datasets[0].data[0] = data.hours_worked;
-                        dailyChart.data.datasets[0].data[1] = Math.max(10 - data.hours_worked, 0);
-                        dailyChart.update();
-                    }
-                }
-            })
-            .catch(error => console.error("Error fetching live hours:", error));
-    }
-
-    setInterval(updateLiveHours, 10000); // Refresh every 10 seconds
-</script>
-
-<!-- ⏳ Countdown Timer Script -->
-<script>
-    function startCountdown(remainingSeconds, clockedIn) {
-        if (!clockedIn) {
-            document.getElementById("workday-timer").innerText = "⏸ Not Clocked In";
-            return;
-        }
-
-        function updateTimer() {
-            if (remainingSeconds > 0) {
-                let hours = Math.floor(remainingSeconds / 3600);
-                let minutes = Math.floor((remainingSeconds % 3600) / 60);
-                document.getElementById("workday-timer").innerText = `${hours}h ${minutes}m`;
-                remainingSeconds--;
-            } else {
-                document.getElementById("workday-timer").innerText = "✅ Workday Completed!";
-            }
-        }
-
-        updateTimer();
-        setInterval(updateTimer, 60000); // Refresh every minute
-    }
-
-    startCountdown({{ remaining_work_seconds|default:0 }}, {{ clocked_in|yesno:"true,false" }});
-</script>
 
 {% endblock %}

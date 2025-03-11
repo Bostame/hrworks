@@ -1,2 +1,15 @@
 db.sqlite3
 db_backup.sqlite3
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tiff
+*.webp
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.cache

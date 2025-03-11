@@ -29,9 +29,9 @@
     <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for user in users %}
         <div class="col">
-            <div class="card user-card">
-                <div class="text-center">
-                    <img src="{{ user.get_profile_picture }}" alt="Profile Picture" class="rounded-circle mb-3">
+            <div class="card user-card text-center">
+                <div class="text-center mb-3">
+                    <img src="{{ user.get_profile_picture }}" alt="Profile Picture" class="rounded-circle">
                 </div>
                 <div class="card-body">
                     <h5 class="fw-bold">{{ user.first_name }} {{ user.last_name }}</h5>

@@ -29,7 +29,6 @@ def register_user(request):
             messages.success(request, "✅ User created successfully!")
             return redirect('dashboard')  # Redirect after creating a user
         else:
-            print("🔴 Form Errors:", form.errors.as_json())  # Debugging
             messages.error(request, "❌ There was an error in the form. Please check the inputs.")
     else:
         form = UserRegistrationForm()
@@ -147,6 +146,11 @@ def clock_out(request):
 def dashboard(request):
     user = request.user
     today = now().date()
+    
+    # Fetch employees only for HR, CEO, and Admins
+    employees = None
+    if user.is_superuser or user.role in ["HR", "CEO"]:
+        employees = CustomUser.objects.filter(is_active=True).order_by('first_name')
 
     # Get today's working hours
     today_entries = TimeTracking.objects.filter(user=user, date=today)
@@ -206,6 +210,7 @@ def dashboard(request):
         "is_hr": is_hr,
         "is_team_lead": is_team_lead,
         "is_ceo": is_ceo,
+        "employees": employees  # Pass employees list for HR/Admins to select for export
     }
 
     return render(request, "accounts/dashboard.html", context)
@@ -244,11 +249,10 @@ def manage_users(request):
 
 @login_required
 def get_live_hours(request):
-    """ API Endpoint to fetch live working hours """
+    """ API Endpoint to fetch live working hours & remaining work time """
     user = request.user
     today = now().date()
 
-    # Get today's working hours
     today_entries = TimeTracking.objects.filter(user=user, date=today)
     total_today_hours = 0
     clocked_in = False
@@ -258,15 +262,32 @@ def get_live_hours(request):
             total_today_hours += float(entry.total_hours)
         elif entry.clock_in and not entry.clock_out:
             clocked_in = True
-            # Calculate active session time
             total_today_hours += (now() - entry.clock_in).total_seconds() / 3600
 
-    return JsonResponse({"hours_worked": round(total_today_hours, 2), "clocked_in": clocked_in})
+    max_work_seconds = 8 * 3600  # 8 hours in seconds
+    elapsed_work_seconds = int(total_today_hours * 3600)  # Convert to seconds
+    remaining_work_seconds = max(max_work_seconds - elapsed_work_seconds, 0)  # Ensure non-negative
+
+    return JsonResponse({
+        "hours_worked": round(total_today_hours, 2),
+        "clocked_in": clocked_in,
+        "remaining_work_seconds": remaining_work_seconds  # ✅ This is now included
+    })
 
 
 @login_required
-def export_pdf(request):
-    user = request.user
+def export_pdf(request, user_id=None):
+    """Allows employees to export their own reports and HR/CEO/Admins to export any user's report."""
+    
+    # If user_id is provided, fetch the requested user
+    if user_id:
+        if not (request.user.is_superuser or request.user.role in ["HR", "CEO"]):
+            messages.error(request, "🚫 You do not have permission to export reports for other users.")
+            return redirect("dashboard")
+        user = get_object_or_404(CustomUser, id=user_id)
+    else:
+        user = request.user  # Employees can only export their own reports
+
     today = now().date()
 
     # Retrieve all work session data for today
@@ -282,21 +303,14 @@ def export_pdf(request):
     # Vacation tracking
     vacation_balance = user.vacation_balance if hasattr(user, 'vacation_balance') else 30
 
-    # DEBUG: Print values before generating the PDF
-    print("User:", user.username)
-    print("Today's Hours:", total_today_hours)
-    print("Monthly Hours:", total_hours_month)
-    print("Overtime:", total_overtime_month)
-    print("Vacation Balance:", vacation_balance)
-
     # Create a buffer for the PDF file
     buffer = io.BytesIO()
     pdf = canvas.Canvas(buffer)
-    
+
     # PDF Title
     pdf.setFont("Helvetica-Bold", 16)
     pdf.drawString(200, 800, "Work Hours Report")
-    
+
     # User Info
     pdf.setFont("Helvetica", 12)
     pdf.drawString(100, 760, f"User: {user.first_name} {user.last_name}")
@@ -403,8 +417,6 @@ def company_calendar_view(request, view_type):
     else:
         title = "📅 Company Calendar"
 
-    # ✅ Debugging: Print the retrieved events
-    print(f"🔍 Retrieved Events for {view_type}: {events}")
 
     context = {
         'title': title,
@@ -426,8 +438,6 @@ def add_event(request):
         end_time = request.POST.get("end_time")
         location = request.POST.get("location", "")
 
-        # Debugging: Print values to terminal
-        print(f"🔍 Received Data -> Title: {title}, Type: {event_type}, Start: {start_time}, End: {end_time}, Location: {location}")
 
         # Ensure start_time and end_time are not None
         if not start_time or not end_time:
