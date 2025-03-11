@@ -6,6 +6,16 @@
 <div class="container mt-4">
     <h2 class="fw-bold">Dashboard</h2>
 
+    {% if user.is_authenticated %}
+
+    <!-- ⏳ Countdown Timer (Updated for Auto Refresh) -->
+    <div class="card shadow-sm border-0 p-3 text-center mb-4">
+        <h6 class="fw-bold text-primary"><i class="fa fa-hourglass-half"></i> Remaining Work Time</h6>
+        <p id="workday-timer" class="fs-4 fw-bold text-danger">00h 00m</p>
+    </div>
+    
+    {% endif %}
+
    <!-- HR & CEO Specific Controls -->
     {% if user.is_superuser or user.role == "HR" or user.role == "CEO" %}
     <div class="card shadow-sm border-0 p-3 mb-4">
@@ -39,10 +49,14 @@
         </div>
     </div>
 
-   <!-- ⏳ Countdown Timer (Updated for Auto Refresh) -->
-    <div class="card shadow-sm border-0 p-3 text-center mb-4">
-        <h6 class="fw-bold text-primary"><i class="fa fa-hourglass-half"></i> Remaining Work Time</h6>
-        <p id="workday-timer" class="fs-4 fw-bold text-danger">00h 00m</p>
+    <!-- Employee Tools Card -->
+    <div class="card shadow-sm border-0 p-3 mb-4 mt-4">
+        <h5 class="fw-bold text-left">🛠️ Employee Tools</h5>
+        <div class="d-flex flex-wrap justify-content-start">
+            <a href="{% url 'export_pdf' %}" class="btn btn-secondary me-3">
+                <i class="fa fa-download"></i> Export My Report
+            </a>
+        </div>
     </div>
 
     <!-- Responsive Grid for Charts -->
@@ -88,15 +102,7 @@
         </div>
     </div>
 
-    <!-- Employee Tools Card -->
-    <div class="card shadow-sm border-0 p-3 mb-4 mt-4">
-        <h5 class="fw-bold text-left">🛠️ Employee Tools</h5>
-        <div class="d-flex flex-wrap justify-content-start">
-            <a href="{% url 'export_pdf' %}" class="btn btn-secondary me-3">
-                <i class="fa fa-download"></i> Export My Report
-            </a>
-        </div>
-    </div>
+
     {% endif %}
 </div>
 
