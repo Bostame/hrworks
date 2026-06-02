@@ -1,4 +1,3 @@
-Here's your **updated README.md** including **all new features** like **time tracking, role-based dashboards, PDF export, and charts.**
 
 ---
 
